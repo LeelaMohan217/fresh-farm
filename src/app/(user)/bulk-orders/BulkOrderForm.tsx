@@ -99,7 +99,7 @@ export default function BulkOrderForm() {
       {/* Event type */}
       <div className="space-y-2">
         <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Event Type</label>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {EVENT_TYPES.map((type) => (
             <button key={type} type="button"
               onClick={() => setForm({ ...form, eventType: type })}

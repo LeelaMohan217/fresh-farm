@@ -36,14 +36,12 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef     = useRef<HTMLDivElement>(null);
 
-  // Reset on route change
   useEffect(() => {
     setQuery("");
     setData({ trending: [], suggestions: [], categories: [], products: [] });
     setOpen(false);
   }, [pathname]);
 
-  // Fetch trending on mount (for empty-state)
   useEffect(() => {
     fetch("/api/products/search?q=")
       .then((r) => r.json())
@@ -81,7 +79,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
     navigate(query.trim(), true);
   };
 
-  // Close on outside click
   useEffect(() => {
     const fn = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
@@ -117,11 +114,8 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
         )}
       </form>
 
-      {/* Dropdown */}
       {open && (
         <div className="absolute top-full mt-2 left-0 right-0 bg-white border border-slate-100 rounded-2xl shadow-2xl z-50 overflow-hidden max-h-[480px] overflow-y-auto">
-
-          {/* ── Trending (empty state) ── */}
           {showEmpty && (
             <div className="p-4">
               <p className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
@@ -139,7 +133,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* ── Suggestions (popular matching queries) ── */}
           {data.suggestions.length > 0 && (
             <div className="pt-2">
               {data.suggestions.map((s) => (
@@ -148,7 +141,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
                 >
                   <Search className="w-4 h-4 text-slate-300 shrink-0 group-hover:text-green-500 transition-colors" />
                   <span className="text-sm text-slate-700 flex-1">
-                    {/* Bold the matched prefix */}
                     <span className="font-bold">{s.slice(0, query.length)}</span>
                     {s.slice(query.length)}
                   </span>
@@ -158,7 +150,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* ── Category matches ── */}
           {data.categories.length > 0 && (
             <div className={data.suggestions.length > 0 ? "border-t border-slate-50 pt-2" : "pt-2"}>
               <p className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 pb-1.5">
@@ -179,7 +170,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* ── Product matches ── */}
           {data.products.length > 0 && (
             <div className="border-t border-slate-50 pt-2">
               <p className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest px-4 pb-1.5">
@@ -207,7 +197,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* ── See all results footer ── */}
           {query.trim() && hasResults && (
             <div className="border-t border-slate-100 px-4 py-3 bg-slate-50/60">
               <button onClick={() => navigate(query.trim(), true)}
@@ -220,7 +209,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* ── No results ── */}
           {showNoResult && (
             <div className="px-4 py-8 text-center">
               <p className="text-2xl mb-2">🔍</p>
@@ -228,7 +216,6 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
               <p className="text-xs text-slate-400 mt-1">Try a different keyword or browse categories</p>
             </div>
           )}
-
         </div>
       )}
     </div>
@@ -241,9 +228,8 @@ export default function Navbar() {
   const { count } = useCart();
   const { user, logout } = useAuth();
 
-  const [menuOpen, setMenuOpen]     = useState(false);
-  const [mobileSearch, setMobileSearch] = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 8);
@@ -262,120 +248,26 @@ export default function Navbar() {
       "sticky top-0 z-50 bg-white transition-shadow duration-200",
       scrolled ? "shadow-sm border-b border-slate-100" : "border-b border-slate-100"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
 
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-sm">
-            <Sprout className="w-4 h-4 text-white" />
-          </div>
-          <div className="hidden sm:block">
-            <span className="font-bold text-slate-900 text-base tracking-tight leading-none block">FarmFresh</span>
-            <span className="text-[10px] text-slate-400 leading-none tracking-wide">Organic &amp; Hydroponic</span>
-          </div>
-        </Link>
-
-        {/* Address selector — desktop */}
-        <div className="hidden md:flex shrink-0">
-          <AddressSelector />
-        </div>
-
-        {/* Divider */}
-        <div className="hidden md:block w-0.5 h-6 bg-slate-200 rounded-full shrink-0" />
-
-        {/* Search bar — desktop */}
-        <div className="hidden md:flex flex-1">
-          <SearchBar />
-        </div>
-
-        {/* Divider */}
-        <div className="hidden md:block w-0.5 h-6 bg-slate-200 rounded-full shrink-0" />
-
-        {/* Right actions */}
-        <div className="flex items-center gap-4">
-
-          {/* Mobile search toggle */}
-          <button
-            onClick={() => { setMobileSearch(!mobileSearch); setMenuOpen(false); }}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
-          >
-            <Search className="w-5 h-5" />
-          </button>
-
-          {/* Auth — desktop */}
-          {user ? (
-            <div className="hidden md:flex relative group">
-              <button className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
-                <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {getInitials(user.name)}
-                </div>
-                <div className="hidden lg:block text-left">
-                  <p className="text-xs font-semibold text-slate-800 leading-none">{user.name.split(" ")[0]}</p>
-                  <p className="text-[10px] text-slate-400 leading-none mt-0.5 max-w-[80px] truncate">{user.email}</p>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-              </button>
-
-              {/* Dropdown */}
-              <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                {/* Profile header */}
-                <div className="px-4 py-3 border-b border-slate-100 mb-1 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
-                    {getInitials(user.name)}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
-                  </div>
-                </div>
-
-                {/* Menu items */}
-                {[
-                  { href: "/account/profile",   icon: User,         label: "My Profile"       },
-                  { href: "/account/orders",     icon: ShoppingBag,  label: "My Orders"        },
-                  { href: "/account/addresses",  icon: MapPin,       label: "Saved Addresses"  },
-                  { href: "/account/settings",   icon: Settings,     label: "Account Settings" },
-                ].map(({ href, icon: Icon, label }) => (
-                  <Link key={href} href={href}
-                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-green-700 transition-colors group/item"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover/item:bg-green-100 flex items-center justify-center shrink-0 transition-colors">
-                      <Icon className="w-3.5 h-3.5 text-slate-500 group-hover/item:text-green-600 transition-colors" />
-                    </div>
-                    {label}
-                  </Link>
-                ))}
-
-                <div className="border-t border-slate-100 mt-1 pt-1">
-                  <button onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
-                  >
-                    <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
-                      <LogOut className="w-3.5 h-3.5 text-red-400" />
-                    </div>
-                    Logout
-                  </button>
-                </div>
-              </div>
+      {/* ── MOBILE layout (hidden on md+) ── */}
+      <div className="md:hidden">
+        {/* Row 1: Logo | Address | Cart + Profile */}
+        <div className="flex items-center gap-2 px-3 pt-3 pb-2">
+          {/* Logo */}
+          <Link href="/" className="shrink-0">
+            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-sm">
+              <Sprout className="w-4 h-4 text-white" />
             </div>
-          ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Link href="/auth/login"
-                className="px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
-              >
-                Login
-              </Link>
-              <Link href="/auth/register"
-                className="px-4 py-1.5 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
-              >
-                Register
-              </Link>
-            </div>
-          )}
+          </Link>
 
-          {/* Cart — always last */}
+          {/* Address selector — takes remaining space */}
+          <div className="flex-1 min-w-0">
+            <AddressSelector />
+          </div>
+
+          {/* Cart */}
           <Link href="/cart"
-            className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 hover:border-green-300 hover:bg-green-50 text-slate-600 hover:text-green-700 transition-all"
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-600 shrink-0"
           >
             <ShoppingCart className="w-5 h-5" />
             {count > 0 && (
@@ -385,24 +277,124 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* Mobile menu toggle */}
-          <button
-            onClick={() => { setMenuOpen(!menuOpen); setMobileSearch(false); }}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
-          >
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Profile / Auth */}
+          {user ? (
+            <button
+              onClick={() => { setMenuOpen(!menuOpen); }}
+              className="w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
+            >
+              {getInitials(user.name)}
+            </button>
+          ) : (
+            <button
+              onClick={() => { setMenuOpen(!menuOpen); }}
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 shrink-0"
+            >
+              <User className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {/* Row 2: Full-width search bar */}
+        <div className="px-3 pb-3">
+          <SearchBar />
         </div>
       </div>
 
-      {/* Mobile search bar */}
-      {mobileSearch && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3">
-          <SearchBar onClose={() => setMobileSearch(false)} />
-        </div>
-      )}
+      {/* ── DESKTOP layout (hidden on mobile) ── */}
+      <div className="hidden md:block">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center shadow-sm">
+              <Sprout className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <span className="font-bold text-slate-900 text-base tracking-tight leading-none block">FarmFresh</span>
+              <span className="text-[10px] text-slate-400 leading-none tracking-wide">Organic &amp; Hydroponic</span>
+            </div>
+          </Link>
 
-      {/* Mobile menu */}
+          <div className="shrink-0"><AddressSelector /></div>
+          <div className="w-0.5 h-6 bg-slate-200 rounded-full shrink-0" />
+          <div className="flex-1"><SearchBar /></div>
+          <div className="w-0.5 h-6 bg-slate-200 rounded-full shrink-0" />
+
+          <div className="flex items-center gap-4">
+            {/* Auth — desktop */}
+            {user ? (
+              <div className="relative group">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer">
+                  <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0">
+                    {getInitials(user.name)}
+                  </div>
+                  <div className="hidden lg:block text-left">
+                    <p className="text-xs font-semibold text-slate-800 leading-none">{user.name.split(" ")[0]}</p>
+                    <p className="text-[10px] text-slate-400 leading-none mt-0.5 max-w-[80px] truncate">{user.email}</p>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                <div className="absolute right-0 top-full mt-2 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="px-4 py-3 border-b border-slate-100 mb-1 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                      {getInitials(user.name)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  {[
+                    { href: "/account/profile",   icon: User,        label: "My Profile"       },
+                    { href: "/account/orders",     icon: ShoppingBag, label: "My Orders"        },
+                    { href: "/account/addresses",  icon: MapPin,      label: "Saved Addresses"  },
+                    { href: "/account/settings",   icon: Settings,    label: "Account Settings" },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <Link key={href} href={href}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-green-700 transition-colors group/item"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-slate-100 group-hover/item:bg-green-100 flex items-center justify-center shrink-0 transition-colors">
+                        <Icon className="w-3.5 h-3.5 text-slate-500 group-hover/item:text-green-600 transition-colors" />
+                      </div>
+                      {label}
+                    </Link>
+                  ))}
+                  <div className="border-t border-slate-100 mt-1 pt-1">
+                    <button onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                        <LogOut className="w-3.5 h-3.5 text-red-400" />
+                      </div>
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Link href="/auth/login" className="px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">Login</Link>
+                <Link href="/auth/register" className="px-4 py-1.5 text-sm font-semibold bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm">Register</Link>
+              </div>
+            )}
+
+            {/* Cart */}
+            <Link href="/cart"
+              className="relative flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 hover:border-green-300 hover:bg-green-50 text-slate-600 hover:text-green-700 transition-all"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {count > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-green-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 ring-2 ring-white">
+                  {count > 99 ? "99+" : count}
+                </span>
+              )}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu drawer */}
       {menuOpen && (
         <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-1">
           <Link href="/" onClick={() => setMenuOpen(false)}
@@ -435,6 +427,17 @@ export default function Navbar() {
                   <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">{getInitials(user.name)}</div>
                   <div><p className="text-sm font-semibold text-slate-800">{user.name}</p><p className="text-[11px] text-slate-400">{user.email}</p></div>
                 </div>
+                {[
+                  { href: "/account/profile",  icon: User,        label: "My Profile"      },
+                  { href: "/account/orders",    icon: ShoppingBag, label: "My Orders"       },
+                  { href: "/account/addresses", icon: MapPin,      label: "Saved Addresses" },
+                ].map(({ href, icon: Icon, label }) => (
+                  <Link key={href} href={href} onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                  >
+                    <Icon className="w-4 h-4" /> {label}
+                  </Link>
+                ))}
                 <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors">
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
