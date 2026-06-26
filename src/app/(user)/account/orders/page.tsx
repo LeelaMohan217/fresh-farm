@@ -142,7 +142,7 @@ export default function OrdersPage() {
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-slate-100 px-6 py-5">
-        <h2 className="text-base font-bold text-slate-900">My Orders</h2>
+        <h2 className="text-[14px] font-semibold text-slate-900">My Orders</h2>
         <p className="text-xs text-slate-400 mt-0.5">{orders.length} order{orders.length !== 1 ? "s" : ""} placed</p>
       </div>
 

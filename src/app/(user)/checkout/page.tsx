@@ -347,7 +347,7 @@ export default function CheckoutPage() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
 
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-6">Checkout</h1>
+        <h1 className="text-[18px] font-bold text-slate-900 mb-6">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -359,7 +359,7 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-green-600" />
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Delivery address</h2>
+                  <h2 className="text-[14px] font-semibold text-slate-900">Delivery address</h2>
                 </div>
                 {!showForm && (
                   <button
@@ -595,7 +595,7 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-2xl border border-slate-100 p-5">
                 <div className="flex items-center gap-2 mb-1">
                   <User className="w-4 h-4 text-green-600" />
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Receiver details</h2>
+                  <h2 className="text-[14px] font-semibold text-slate-900">Receiver details</h2>
                 </div>
                 <p className="text-xs text-slate-400 mb-4">Leave blank to deliver to yourself. Fill in if ordering for someone else.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -630,7 +630,7 @@ export default function CheckoutPage() {
 
             {/* Payment method */}
             <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">Payment method</h2>
+              <h2 className="text-[14px] font-semibold text-slate-900 mb-4">Payment method</h2>
               <div className="space-y-2">
                 {(["COD", "UPI", "Card"] as PaymentMethod[]).map((m) => (
                   <label key={m} className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition-all ${
@@ -657,7 +657,7 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-2xl border border-slate-100 p-5">
               <div className="flex items-center gap-2 mb-4">
                 <ShoppingBag className="w-4 h-4 text-green-600" />
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Order summary</h2>
+                <h2 className="text-[14px] font-semibold text-slate-900">Order summary</h2>
               </div>
 
               <div className="space-y-3 mb-4">

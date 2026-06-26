@@ -182,7 +182,7 @@ export default function CartPage() {
           <div className="space-y-3">
             <div className="bg-white rounded-2xl border border-slate-100">
               <div className="px-5 pt-5 pb-4 border-b border-slate-100">
-                <h2 className="text-[15px] font-bold text-slate-900">Bill details</h2>
+                <h2 className="text-[14px] font-semibold text-slate-900">Bill details</h2>
               </div>
 
               <div className="px-5 py-4 space-y-3">

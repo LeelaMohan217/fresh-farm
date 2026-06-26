@@ -111,7 +111,7 @@ export default function AddressesPage() {
       {/* Header */}
       <div className="bg-white rounded-2xl border border-slate-100 px-6 py-5 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-bold text-slate-900">Saved Addresses</h2>
+          <h2 className="text-[14px] font-semibold text-slate-900">Saved Addresses</h2>
           <p className="text-xs text-slate-400 mt-0.5">{addresses.length} address{addresses.length !== 1 ? "es" : ""} saved</p>
         </div>
         <button onClick={openAdd}

@@ -41,7 +41,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         >
           <ChevronLeft className="w-5 h-5 text-slate-600" />
         </Link>
-        <p className="text-[15px] font-semibold text-slate-900">
+        <p className="text-[18px] font-bold text-slate-900">
           {isOverview ? "My Account" : (currentPage?.label ?? "My Account")}
         </p>
       </div>
