@@ -54,7 +54,7 @@ function runTests(testPath?: string): string {
     return output;
   } catch (e: unknown) {
     const err = e as { stdout?: string; stderr?: string; message?: string };
-    return (err.stdout ?? "") + (err.stderr ?? "") || err.message ?? String(e);
+    return ((err.stdout ?? "") + (err.stderr ?? "")) || (err.message ?? String(e));
   }
 }
 
