@@ -127,9 +127,9 @@ export async function POST(req: NextRequest) {
     }
 
     orderEvents.emit("order-update");
-    revalidateTag("orders");
-    revalidateTag("customers");
-    revalidateTag("products");
+    revalidateTag("orders", {});
+    revalidateTag("customers", {});
+    revalidateTag("products", {});
     return NextResponse.json({ orderId, branchAssigned: branchId !== null });
   } catch (e) {
     console.error("ORDER ERROR:", e);

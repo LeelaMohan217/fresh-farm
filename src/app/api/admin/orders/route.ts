@@ -65,10 +65,10 @@ export async function PATCH(req: NextRequest) {
          FROM order_items oi WHERE oi.order_id = $1 AND oi.product_id = p.id`,
         [id]
       );
-      revalidateTag("products");
+      revalidateTag("products", {});
     }
 
-    revalidateTag("orders");
+    revalidateTag("orders", {});
     return NextResponse.json({ ok: true, status });
   } catch (e) {
     console.error("PATCH ORDER ERROR:", e);
@@ -87,8 +87,8 @@ export async function DELETE(req: NextRequest) {
 
     await pool.query(`DELETE FROM order_items WHERE order_id = $1`, [id]);
     await pool.query(`DELETE FROM orders WHERE id = $1`, [id]);
-    revalidateTag("orders");
-    revalidateTag("customers"); // customer order stats (total_orders, total_spent) changed
+    revalidateTag("orders", {});
+    revalidateTag("customers", {}); // customer order stats (total_orders, total_spent) changed
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE ORDER ERROR:", e);

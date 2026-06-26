@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const customer = result.rows[0];
 
-    revalidateTag("customers");
+    revalidateTag("customers", {});
 
     const token = await signToken({ id: customer.id, name: customer.name, email: customer.email });
 

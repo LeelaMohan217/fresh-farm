@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Loader2, Sprout, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
@@ -10,6 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function PasswordResetConfirmPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-green-600" /></div>}>
+      <PasswordResetConfirmContent />
+    </Suspense>
+  );
+}
+
+function PasswordResetConfirmContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");

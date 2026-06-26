@@ -20,9 +20,9 @@ export async function DELETE(req: NextRequest) {
     await pool.query(`DELETE FROM orders WHERE customer_id = $1`, [id]);
     await pool.query(`DELETE FROM bulk_orders WHERE customer_id = $1`, [id]);
     await pool.query(`DELETE FROM customers WHERE id = $1`, [id]);
-    revalidateTag("customers");
-    revalidateTag("orders");      // cascade-deleted orders no longer exist
-    revalidateTag("bulk-orders"); // cascade-deleted bulk orders no longer exist
+    revalidateTag("customers", {});
+    revalidateTag("orders", {});      // cascade-deleted orders no longer exist
+    revalidateTag("bulk-orders", {}); // cascade-deleted bulk orders no longer exist
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE CUSTOMER ERROR:", e);

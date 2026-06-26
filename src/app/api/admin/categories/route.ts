@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       [name.trim(), slug, imageUrl ?? null, active, parentId ?? null]
     );
 
-    revalidateTag("categories");
+    revalidateTag("categories", {});
     return NextResponse.json({ category: rows[0] }, { status: 201 });
   } catch (e) {
     console.error("ADD CATEGORY ERROR:", e);
@@ -66,8 +66,8 @@ export async function PATCH(req: NextRequest) {
       [name.trim(), slug, imageUrl ?? null, active ?? true, parentId ?? null, id]
     );
 
-    revalidateTag("categories");
-    revalidateTag("products");
+    revalidateTag("categories", {});
+    revalidateTag("products", {});
     return NextResponse.json({ category: rows[0] });
   } catch (e) {
     console.error("PATCH CATEGORY ERROR:", e);
@@ -102,7 +102,7 @@ export async function DELETE(req: NextRequest) {
       );
 
     await pool.query("DELETE FROM categories WHERE id = $1", [id]);
-    revalidateTag("categories");
+    revalidateTag("categories", {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE CATEGORY ERROR:", e);

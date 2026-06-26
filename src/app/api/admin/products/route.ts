@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
       [name, description || null, Number(price), unit, Number(categoryId), Number(stock) || 0, primaryImage, images, effectiveBranchId]
     );
 
-    revalidateTag("products");
-    revalidateTag("categories");
+    revalidateTag("products", {});
+    revalidateTag("categories", {});
     return NextResponse.json({ product: rows[0] }, { status: 201 });
   } catch (e) {
     console.error("ADD PRODUCT ERROR:", e);
@@ -60,7 +60,7 @@ export async function PATCH(req: NextRequest) {
     );
 
     await notifyLowStock(Number(id));
-    revalidateTag("products");
+    revalidateTag("products", {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("PATCH PRODUCT ERROR:", e);
@@ -87,8 +87,8 @@ export async function DELETE(req: NextRequest) {
 
     await pool.query("DELETE FROM order_items WHERE product_id = $1", [id]);
     await pool.query("DELETE FROM products WHERE id = $1", [id]);
-    revalidateTag("products");
-    revalidateTag("categories");
+    revalidateTag("products", {});
+    revalidateTag("categories", {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE PRODUCT ERROR:", e);

@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest) {
       [status, id]
     );
 
-    revalidateTag("bulk-orders");
+    revalidateTag("bulk-orders", {});
     return NextResponse.json({ ok: true, status });
   } catch (e) {
     console.error("PATCH BULK ORDER ERROR:", e);
@@ -39,7 +39,7 @@ export async function DELETE(req: NextRequest) {
 
     await pool.query(`DELETE FROM bulk_order_items WHERE bulk_order_id = $1`, [id]);
     await pool.query(`DELETE FROM bulk_orders WHERE id = $1`, [id]);
-    revalidateTag("bulk-orders");
+    revalidateTag("bulk-orders", {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE BULK ORDER ERROR:", e);

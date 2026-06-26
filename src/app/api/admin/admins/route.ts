@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       branchName = br.rows[0]?.name ?? null;
     }
 
-    revalidateTag("admins");
+    revalidateTag("admins", {});
     return NextResponse.json({
       admin: {
         ...rows[0],
@@ -117,7 +117,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Cannot delete the last admin account." }, { status: 409 });
 
     await pool.query("DELETE FROM admins WHERE id = $1", [id]);
-    revalidateTag("admins");
+    revalidateTag("admins", {});
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("DELETE ADMIN ERROR:", e);
@@ -152,7 +152,7 @@ export async function PATCH(req: NextRequest) {
       branchName = br.rows[0]?.name ?? null;
     }
 
-    revalidateTag("admins");
+    revalidateTag("admins", {});
     return NextResponse.json({ admin: { ...rows[0], branch_name: branchName } });
   } catch (e) {
     console.error("UPDATE ADMIN ERROR:", e);
