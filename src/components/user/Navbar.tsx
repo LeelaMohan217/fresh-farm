@@ -14,7 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import AddressSelector from "@/components/user/AddressSelector";
 
-type SearchProduct  = { id: number; name: string; price: number; unit: string; imageUrl: string | null; categoryName: string; categorySlug: string };
+type SearchProduct  = { id: number; name: string; price: number; unit: string; stock: number; imageUrl: string | null; categoryName: string; categorySlug: string };
 type SearchCategory = { id: number; name: string; slug: string };
 type SearchData     = { trending: string[]; suggestions: string[]; categories: SearchCategory[]; products: SearchProduct[] };
 
@@ -176,22 +176,28 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
                 Products
               </p>
               {data.products.map((p) => (
-                <button key={p.id} onClick={() => navigate(p.name, true)}
+                <button key={p.id} onClick={() => { setOpen(false); onClose?.(); router.push(`/shop/product/${p.id}`); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition-colors text-left group"
                 >
-                  {p.imageUrl ? (
-                    <Image src={p.imageUrl} alt={p.name} width={40} height={40}
-                      className="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-100" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center shrink-0 text-lg border border-slate-100">
-                      {CATEGORY_EMOJI[p.categorySlug] ?? "🌱"}
-                    </div>
-                  )}
+                  <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-100 bg-slate-50">
+                    {p.imageUrl
+                      ? <Image src={p.imageUrl} alt={p.name} fill className="object-cover" />
+                      : <span className="absolute inset-0 flex items-center justify-center text-lg">{CATEGORY_EMOJI[p.categorySlug] ?? "🌱"}</span>
+                    }
+                    {p.stock === 0 && (
+                      <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                        <span className="text-[9px] font-bold text-slate-500 text-center leading-tight">Out of<br/>stock</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 truncate">{p.name}</p>
+                    <p className={`text-sm font-semibold truncate ${p.stock === 0 ? "text-slate-400" : "text-slate-900"}`}>{p.name}</p>
                     <p className="text-xs text-slate-400">{p.categoryName}</p>
                   </div>
-                  <p className="text-sm font-bold text-green-600 shrink-0">₹{p.price}<span className="text-xs font-normal text-slate-400">/{p.unit}</span></p>
+                  {p.stock > 0
+                    ? <p className="text-sm font-bold text-green-600 shrink-0">₹{p.price}<span className="text-xs font-normal text-slate-400">/{p.unit}</span></p>
+                    : <span className="text-[11px] font-semibold text-slate-400 shrink-0">OOS</span>
+                  }
                 </button>
               ))}
             </div>

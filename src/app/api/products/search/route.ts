@@ -42,12 +42,12 @@ export async function GET(req: NextRequest) {
 
     // Product matches
     pool.query(
-      `SELECT p.id, p.name, p.price, p.unit, p.image_url,
+      `SELECT p.id, p.name, p.price, p.unit, p.stock, p.image_url,
               c.name AS category_name, c.slug AS category_slug
        FROM products p
        JOIN categories c ON c.id = p.category_id
-       WHERE p.stock > 0 AND p.name ILIKE $1
-       ORDER BY p.name ASC
+       WHERE p.name ILIKE $1
+       ORDER BY (p.stock > 0) DESC, p.name ASC
        LIMIT 6`,
       [`%${q}%`]
     ),
@@ -70,6 +70,7 @@ export async function GET(req: NextRequest) {
       name: r.name as string,
       price: Number(r.price),
       unit: r.unit as string,
+      stock: r.stock as number,
       imageUrl: (r.image_url ?? null) as string | null,
       categoryName: r.category_name as string,
       categorySlug: r.category_slug as string,
