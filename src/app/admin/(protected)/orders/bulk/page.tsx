@@ -8,18 +8,29 @@ export const dynamic = "force-dynamic";
 const VALID_STATUSES = new Set(["Confirmed", "Pending", "Processing", "Cancelled"]);
 
 async function getBulkOrders(): Promise<BulkOrderRow[]> {
-  const { rows } = await pool.query(`
-    SELECT b.*, c.name as customer_name,
-      COALESCE(
-        STRING_AGG(bi.item_name, ', ' ORDER BY bi.id),
-        b.items_desc
-      ) AS items_list
-    FROM bulk_orders b
-    JOIN customers c ON c.id = b.customer_id
-    LEFT JOIN bulk_order_items bi ON bi.bulk_order_id = b.id
-    GROUP BY b.id, c.name
-    ORDER BY b.created_at DESC
-  `);
+  let rows: Record<string, unknown>[];
+  try {
+    ({ rows } = await pool.query(`
+      SELECT b.*, c.name as customer_name,
+        COALESCE(
+          STRING_AGG(bi.item_name, ', ' ORDER BY bi.id),
+          b.items_desc
+        ) AS items_list
+      FROM bulk_orders b
+      JOIN customers c ON c.id = b.customer_id
+      LEFT JOIN bulk_order_items bi ON bi.bulk_order_id = b.id
+      GROUP BY b.id, c.name
+      ORDER BY b.created_at DESC
+    `));
+  } catch {
+    // bulk_order_items table may not exist — fall back to items_desc only
+    ({ rows } = await pool.query(`
+      SELECT b.*, c.name as customer_name, b.items_desc AS items_list
+      FROM bulk_orders b
+      JOIN customers c ON c.id = b.customer_id
+      ORDER BY b.created_at DESC
+    `));
+  }
 
   return rows.map((r) => ({
     id: String(r.id),
