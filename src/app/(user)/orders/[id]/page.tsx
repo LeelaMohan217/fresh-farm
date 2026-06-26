@@ -352,11 +352,20 @@ export default function OrderDetailPage() {
             Reorder
           </button>
         )}
-        {(order.status === "Pending" || order.status === "Processing") && (
-          <button onClick={() => setShowCancel(true)}
-            className="px-6 py-2.5 bg-white text-red-600 text-sm font-semibold rounded-xl border border-red-200 hover:bg-red-50 transition-colors cursor-pointer">
-            Cancel order
-          </button>
+        {order.status !== "Delivered" && order.status !== "Cancelled" && (
+          <div className="relative group">
+            <button
+              onClick={() => { if (order.status === "Pending" || order.status === "Processing") setShowCancel(true); }}
+              disabled={order.status === "Shipped"}
+              className="px-6 py-2.5 bg-white text-red-600 text-sm font-semibold rounded-xl border border-red-200 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:bg-red-50">
+              Cancel order
+            </button>
+            {order.status === "Shipped" && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
+                Cannot cancel — order is already shipped
+              </div>
+            )}
+          </div>
         )}
       </div>
 

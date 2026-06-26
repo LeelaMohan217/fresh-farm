@@ -250,15 +250,22 @@ export default function OrdersPage() {
                           Reorder
                         </button>
                       )}
-                      {(o.status === "Pending" || o.status === "Processing") && (
+                      {o.status !== "Delivered" && o.status !== "Cancelled" && (
+                        <div className="relative group">
                         <button
-                          onClick={() => { setCancelTarget(o); setCancelReason(""); setCancelError(""); }}
-                          className="text-xs font-semibold text-red-500 hover:text-red-700 border border-red-200 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                          onClick={() => { if (o.status === "Pending" || o.status === "Processing") { setCancelTarget(o); setCancelReason(""); setCancelError(""); } }}
+                          disabled={o.status === "Shipped"}
+                          className="text-xs font-semibold text-red-500 border border-red-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:text-red-700 hover:enabled:bg-red-50"
                         >
                           Cancel order
                         </button>
+                        {o.status === "Shipped" && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
+                            Cannot cancel — order is already shipped
+                          </div>
+                        )}
+                        </div>
                       )}
-                    </div>
                   </div>
                 )}
               </div>
