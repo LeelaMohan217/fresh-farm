@@ -160,7 +160,7 @@ export default function OrdersPage() {
             const date = new Date(o.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
             return (
-              <div key={o.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-green-200 hover:shadow-sm transition-all duration-200">
+              <div key={o.id} className="bg-white rounded-2xl border border-slate-100 hover:border-green-200 hover:shadow-sm transition-all duration-200">
                 {/* Order header */}
                 <button
                   onClick={() => setExpanded(isOpen ? null : o.id)}
@@ -260,7 +260,7 @@ export default function OrdersPage() {
                           Cancel order
                         </button>
                         {o.status === "Shipped" && (
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
                             Cannot cancel — order is already shipped
                           </div>
                         )}
