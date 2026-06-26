@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Sprout, Eye, EyeOff, Loader2, Leaf, Truck, ShieldCheck } from "lucide-react";
+import { Sprout, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type FieldErrors = {
@@ -15,7 +14,9 @@ type FieldErrors = {
 export default function RegisterPage() {
   const router = useRouter();
   const { refresh } = useAuth();
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", password: "" });
+  const [form, setForm] = useState({
+    firstName: "", lastName: "", email: "", phone: "", password: "",
+  });
   const [showPw, setShowPw]           = useState(false);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState("");
@@ -30,26 +31,28 @@ export default function RegisterPage() {
   function validate(): FieldErrors {
     const errs: FieldErrors = {};
     const nameRe = /^[A-Za-z\s'-]+$/;
-    if (!form.firstName.trim()) errs.firstName = "First name is required.";
-    else if (form.firstName.trim().length < 2) errs.firstName = "Min. 2 characters.";
+
+    if (!form.firstName.trim()) errs.firstName = "Enter your first name.";
+    else if (form.firstName.trim().length < 2) errs.firstName = "At least 2 characters.";
     else if (!nameRe.test(form.firstName.trim())) errs.firstName = "Letters only.";
 
-    if (!form.lastName.trim()) errs.lastName = "Last name is required.";
-    else if (form.lastName.trim().length < 2) errs.lastName = "Min. 2 characters.";
+    if (!form.lastName.trim()) errs.lastName = "Enter your last name.";
+    else if (form.lastName.trim().length < 2) errs.lastName = "At least 2 characters.";
     else if (!nameRe.test(form.lastName.trim())) errs.lastName = "Letters only.";
 
-    if (!form.email.trim()) errs.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errs.email = "Enter a valid email address.";
+    if (!form.email.trim()) errs.email = "Enter your email address.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errs.email = "That email address isn't valid.";
 
     const phone = form.phone.trim().replace(/\s+/g, "");
-    if (!phone) errs.phone = "Phone number is required.";
+    if (!phone) errs.phone = "Enter your phone number.";
     else if (!/^(\+91)?[6-9]\d{9}$/.test(phone)) errs.phone = "Enter a valid 10-digit Indian mobile number.";
 
-    if (!form.password) errs.password = "Password is required.";
-    else if (form.password.length < 8) errs.password = "Min. 8 characters.";
-    else if (!/[A-Z]/.test(form.password)) errs.password = "Must include at least one uppercase letter.";
-    else if (!/[0-9]/.test(form.password)) errs.password = "Must include at least one number.";
-    else if (!/[^A-Za-z0-9]/.test(form.password)) errs.password = "Must include at least one special character.";
+    if (!form.password) errs.password = "Enter a password.";
+    else if (form.password.length < 8) errs.password = "Use at least 8 characters.";
+    else if (!/[A-Z]/.test(form.password)) errs.password = "Include at least one uppercase letter.";
+    else if (!/[0-9]/.test(form.password)) errs.password = "Include at least one number.";
+    else if (!/[^A-Za-z0-9]/.test(form.password)) errs.password = "Include at least one special character.";
+
     return errs;
   }
 
@@ -60,14 +63,16 @@ export default function RegisterPage() {
     if (Object.keys(errs).length) { setFieldErrors(errs); return; }
     setLoading(true);
     try {
-      const { firstName, lastName, ...rest } = form;
-      const payload = { ...rest, name: `${firstName.trim()} ${lastName.trim()}` };
+      const payload = {
+        email: form.email, phone: form.phone, password: form.password,
+        name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+      };
       const res  = await fetch("/api/auth/register", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error); return; }
+      if (!res.ok) { setError(data.error ?? "Couldn't create your account. Please try again."); return; }
       await refresh();
       router.push("/");
     } catch {
@@ -78,245 +83,187 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen bg-white sm:bg-[#F7F8FA] flex flex-col">
 
-      {/* ── DESKTOP: left farm photo (lg+) ── */}
-      <div className="hidden lg:block relative w-1/2">
-        <Image
-          src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&q=80"
-          alt="Fresh vegetables" fill className="object-cover" priority
-        />
-        <div className="absolute inset-0 bg-green-900/60" />
-        <div className="absolute inset-0 flex flex-col justify-between p-12 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-sm">
+      {/* top bar — desktop only */}
+      <div className="hidden sm:flex items-center justify-between px-8 py-5">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+            <Sprout className="w-[18px] h-[18px] text-white" />
+          </div>
+          <span className="text-[15px] font-semibold text-slate-900">FarmFresh</span>
+        </Link>
+        <Link href="/auth/login"
+          className="text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors">
+          Sign in
+        </Link>
+      </div>
+
+      {/* center card */}
+      <div className="flex-1 flex items-start sm:items-center justify-center px-0 sm:px-4 py-0 sm:py-8">
+        <div className="w-full sm:max-w-[440px] bg-white sm:border sm:border-[#E5E7EB] sm:rounded-2xl sm:shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.04)] px-6 sm:px-10 pt-10 pb-10">
+
+          {/* brand mark */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-11 h-11 bg-green-600 rounded-xl flex items-center justify-center mb-4">
               <Sprout className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <p className="font-bold text-lg leading-tight">FarmFresh</p>
-              <p className="text-xs text-white/70">Organic &amp; Hydroponic</p>
-            </div>
+            <h1 className="text-[22px] font-semibold text-[#111827] tracking-[-0.3px]">Create your account</h1>
+            <p className="text-[14px] text-[#6B7280] mt-1">Join FarmFresh — fresh produce delivered</p>
           </div>
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold leading-snug drop-shadow">
-              Farm-fresh produce,<br />delivered to your door.
-            </h1>
-            <p className="text-white/80 text-sm leading-relaxed max-w-sm">
-              Join thousands of families who trust FarmFresh for 100% organic vegetables, fruits, and hydroponic greens grown without chemicals.
-            </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              {["100% Organic", "Zero Pesticides", "Farm Fresh", "Fast Delivery", "Hydroponic"].map((tag) => (
-                <span key={tag} className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs text-white/90 border border-white/20">{tag}</span>
-              ))}
-            </div>
-          </div>
-          <p className="text-xs text-white/40">&copy; 2026 FarmFresh. All rights reserved.</p>
-        </div>
-      </div>
-
-      {/* ── DESKTOP: right form panel (lg+) ── */}
-      <div className="hidden lg:flex flex-1 items-center justify-center px-6 py-6 bg-[#F8FAFC] overflow-y-auto">
-        <div className="w-full max-w-sm space-y-5">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">Create your account</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Fill in your details to get started.</p>
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-            <DesktopForm
-              form={form} set={set} showPw={showPw} setShowPw={setShowPw}
-              loading={loading} error={error} fieldErrors={fieldErrors}
-              onSubmit={handleSubmit}
-            />
-          </div>
-          <p className="text-center text-sm text-slate-500">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="text-green-600 font-semibold hover:text-green-700">Sign in</Link>
-          </p>
-        </div>
-      </div>
-
-      {/* ── MOBILE layout (hidden on lg+) ── */}
-      <div className="flex lg:hidden flex-col w-full min-h-screen">
-
-        {/* Green hero header */}
-        <div className="relative bg-gradient-to-br from-green-600 via-green-500 to-emerald-400 px-6 pt-12 pb-10 flex-shrink-0">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4" />
-
-          <div className="relative">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-5 backdrop-blur-sm border border-white/30">
-              <Sprout className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-white leading-tight">Join FarmFresh</h1>
-            <p className="text-white/80 text-sm mt-1">Fresh & organic, delivered daily</p>
-
-            <div className="flex gap-3 mt-5">
-              {[
-                { icon: Leaf,        label: "100% Organic" },
-                { icon: Truck,       label: "Fast Delivery" },
-                { icon: ShieldCheck, label: "Secure" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
-                  <Icon className="w-3 h-3 text-white" />
-                  <span className="text-[11px] font-semibold text-white">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* White form sheet */}
-        <div className="flex-1 bg-white rounded-t-3xl -mt-5 px-6 pt-7 pb-8 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <h2 className="text-lg font-bold text-slate-900 mb-5">Create your account</h2>
 
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
-            {/* Name row */}
+            {/* name row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">First name</label>
+                <label htmlFor="firstName" className="block text-[13px] font-medium text-[#374151]">First name</label>
                 <input
-                  value={form.firstName} onChange={set("firstName")} placeholder="Priya"
-                  className={mobileInput(!!fieldErrors.firstName)}
+                  id="firstName"
+                  value={form.firstName}
+                  onChange={set("firstName")}
+                  placeholder="Priya"
+                  autoComplete="given-name"
+                  className={inputCls(!!fieldErrors.firstName)}
                 />
-                {fieldErrors.firstName && <p className="text-xs text-red-500">{fieldErrors.firstName}</p>}
+                {fieldErrors.firstName && <p className="text-[12px] text-red-500">{fieldErrors.firstName}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Last name</label>
+                <label htmlFor="lastName" className="block text-[13px] font-medium text-[#374151]">Last name</label>
                 <input
-                  value={form.lastName} onChange={set("lastName")} placeholder="Sharma"
-                  className={mobileInput(!!fieldErrors.lastName)}
+                  id="lastName"
+                  value={form.lastName}
+                  onChange={set("lastName")}
+                  placeholder="Sharma"
+                  autoComplete="family-name"
+                  className={inputCls(!!fieldErrors.lastName)}
                 />
-                {fieldErrors.lastName && <p className="text-xs text-red-500">{fieldErrors.lastName}</p>}
+                {fieldErrors.lastName && <p className="text-[12px] text-red-500">{fieldErrors.lastName}</p>}
               </div>
             </div>
 
-            {/* Email */}
+            {/* email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Email address</label>
+              <label htmlFor="email" className="block text-[13px] font-medium text-[#374151]">Email address</label>
               <input
-                type="email" value={form.email} onChange={set("email")}
-                placeholder="you@example.com" autoComplete="email"
-                className={mobileInput(!!fieldErrors.email)}
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={form.email}
+                onChange={set("email")}
+                placeholder="you@example.com"
+                className={inputCls(!!fieldErrors.email)}
               />
-              {fieldErrors.email && <p className="text-xs text-red-500">{fieldErrors.email}</p>}
+              {fieldErrors.email && <p className="text-[12px] text-red-500">{fieldErrors.email}</p>}
             </div>
 
-            {/* Phone */}
+            {/* phone */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Phone number</label>
+              <label htmlFor="phone" className="block text-[13px] font-medium text-[#374151]">Mobile number</label>
               <input
-                type="tel" value={form.phone} onChange={set("phone")}
-                placeholder="+91 98765 43210" autoComplete="tel"
-                className={mobileInput(!!fieldErrors.phone)}
+                id="phone"
+                type="tel"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={set("phone")}
+                placeholder="+91 98765 43210"
+                className={inputCls(!!fieldErrors.phone)}
               />
-              {fieldErrors.phone && <p className="text-xs text-red-500">{fieldErrors.phone}</p>}
+              {fieldErrors.phone && <p className="text-[12px] text-red-500">{fieldErrors.phone}</p>}
             </div>
 
-            {/* Password */}
+            {/* password */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Password</label>
+              <label htmlFor="password" className="block text-[13px] font-medium text-[#374151]">Password</label>
               <div className="relative">
                 <input
-                  type={showPw ? "text" : "password"} value={form.password} onChange={set("password")}
-                  placeholder="Min. 8 chars, uppercase, number, symbol"
+                  id="password"
+                  type={showPw ? "text" : "password"}
                   autoComplete="new-password"
-                  className={`${mobileInput(!!fieldErrors.password)} pr-12`}
+                  value={form.password}
+                  onChange={set("password")}
+                  placeholder="Min. 8 chars, uppercase, number, symbol"
+                  className={`${inputCls(!!fieldErrors.password)} pr-11`}
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <button
+                  type="button"
+                  onClick={() => setShowPw((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPw ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                 </button>
               </div>
-              {fieldErrors.password && <p className="text-xs text-red-500">{fieldErrors.password}</p>}
+              {fieldErrors.password && <p className="text-[12px] text-red-500">{fieldErrors.password}</p>}
             </div>
 
+            {/* server error */}
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-                <p className="text-xs text-red-600">{error}</p>
-              </div>
+              <p className="text-[13px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-3.5 py-2.5 leading-snug">
+                {error}
+              </p>
             )}
 
-            <button type="submit" disabled={loading}
-              className="w-full h-12 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-60 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 mt-2 text-sm shadow-sm shadow-green-200"
+            {/* submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-[46px] bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-55 text-white text-[15px] font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 mt-1"
             >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating account...</> : "Create account"}
+              {loading
+                ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Creating account…</span></>
+                : "Create account"}
             </button>
+
+            <p className="text-center text-[12px] text-[#9CA3AF] leading-relaxed px-2">
+              By continuing you agree to our{" "}
+              <Link href="/terms" className="text-[#6B7280] hover:text-[#374151] underline underline-offset-2 transition-colors">Terms</Link>
+              {" "}and{" "}
+              <Link href="/privacy" className="text-[#6B7280] hover:text-[#374151] underline underline-offset-2 transition-colors">Privacy Policy</Link>.
+            </p>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="text-green-600 font-semibold">Sign in</Link>
-          </p>
+          {/* divider */}
+          <div className="relative my-7">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#E5E7EB]" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-3 text-[12px] text-[#9CA3AF]">Already have an account?</span>
+            </div>
+          </div>
+
+          <Link
+            href="/auth/login"
+            className="flex items-center justify-center w-full h-[42px] border border-[#D1D5DB] hover:border-[#9CA3AF] text-[14px] font-medium text-[#374151] rounded-lg transition-colors"
+          >
+            Sign in instead
+          </Link>
         </div>
       </div>
+
+      {/* footer */}
+      <footer className="py-5 px-8">
+        <p className="text-center text-[12px] text-[#9CA3AF]">
+          &copy; 2026 FarmFresh &middot;{" "}
+          <Link href="/privacy" className="hover:text-[#6B7280] transition-colors">Privacy</Link>
+          {" "}&middot;{" "}
+          <Link href="/terms" className="hover:text-[#6B7280] transition-colors">Terms</Link>
+          {" "}&middot;{" "}
+          <Link href="/help" className="hover:text-[#6B7280] transition-colors">Help</Link>
+        </p>
+      </footer>
     </div>
   );
 }
 
-function mobileInput(hasError: boolean) {
-  return `w-full h-12 px-4 rounded-xl border text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+function inputCls(hasError: boolean) {
+  return [
+    "block w-full h-[46px] rounded-lg border px-3.5 text-[15px] text-[#111827]",
+    "placeholder-[#9CA3AF] bg-white",
+    "focus:outline-none focus:ring-1 transition-[border-color,box-shadow]",
     hasError
-      ? "border-red-400 focus:ring-red-500/20"
-      : "border-slate-200 focus:ring-green-500/30 focus:border-green-400"
-  }`;
-}
-
-function DesktopForm({
-  form, set, showPw, setShowPw, loading, error, fieldErrors, onSubmit,
-}: {
-  form: { firstName: string; lastName: string; email: string; phone: string; password: string };
-  set: (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  showPw: boolean; setShowPw: (v: boolean) => void;
-  loading: boolean; error: string; fieldErrors: FieldErrors;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}) {
-  const fc = (f: keyof FieldErrors) =>
-    `w-full h-10 px-3 rounded-xl border text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-      fieldErrors[f] ? "border-red-400 focus:ring-red-500/20" : "border-slate-200 focus:ring-green-500/30 focus:border-green-400"
-    }`;
-
-  return (
-    <form onSubmit={onSubmit} noValidate className="space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-700">First name <span className="text-red-500">*</span></label>
-          <input value={form.firstName} onChange={set("firstName")} placeholder="Priya" className={fc("firstName")} />
-          {fieldErrors.firstName && <p className="text-[11px] text-red-500">{fieldErrors.firstName}</p>}
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-slate-700">Last name <span className="text-red-500">*</span></label>
-          <input value={form.lastName} onChange={set("lastName")} placeholder="Sharma" className={fc("lastName")} />
-          {fieldErrors.lastName && <p className="text-[11px] text-red-500">{fieldErrors.lastName}</p>}
-        </div>
-      </div>
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-slate-700">Email address <span className="text-red-500">*</span></label>
-        <input type="email" value={form.email} onChange={set("email")} placeholder="you@example.com" className={fc("email")} />
-        {fieldErrors.email && <p className="text-[11px] text-red-500">{fieldErrors.email}</p>}
-      </div>
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-slate-700">Phone number <span className="text-red-500">*</span></label>
-        <input type="tel" value={form.phone} onChange={set("phone")} placeholder="+91 98765 43210" className={fc("phone")} />
-        {fieldErrors.phone && <p className="text-[11px] text-red-500">{fieldErrors.phone}</p>}
-      </div>
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-slate-700">Password <span className="text-red-500">*</span></label>
-        <div className="relative">
-          <input type={showPw ? "text" : "password"} value={form.password} onChange={set("password")}
-            placeholder="Min. 8 chars, uppercase, number, symbol" className={`${fc("password")} pr-10`} />
-          <button type="button" onClick={() => setShowPw(!showPw)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-            {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-        {fieldErrors.password && <p className="text-[11px] text-red-500">{fieldErrors.password}</p>}
-      </div>
-      {error && <p className="text-xs text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">{error}</p>}
-      <button type="submit" disabled={loading}
-        className="w-full h-10 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer">
-        {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating account...</> : "Create account"}
-      </button>
-    </form>
-  );
+      ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+      : "border-[#D1D5DB] focus:border-green-500 focus:ring-green-500/20",
+  ].join(" ");
 }

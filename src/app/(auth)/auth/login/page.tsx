@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Sprout, Eye, EyeOff, Loader2, Leaf, Truck, ShieldCheck } from "lucide-react";
+import { Sprout, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type FieldErrors = { email?: string; password?: string };
@@ -12,8 +11,8 @@ type FieldErrors = { email?: string; password?: string };
 export default function LoginPage() {
   const router = useRouter();
   const { refresh } = useAuth();
-  const [form, setForm]     = useState({ email: "", password: "" });
-  const [showPw, setShowPw] = useState(false);
+  const [form, setForm]               = useState({ email: "", password: "" });
+  const [showPw, setShowPw]           = useState(false);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -26,9 +25,9 @@ export default function LoginPage() {
 
   function validate(): FieldErrors {
     const errs: FieldErrors = {};
-    if (!form.email.trim()) errs.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errs.email = "Enter a valid email address.";
-    if (!form.password) errs.password = "Password is required.";
+    if (!form.email.trim()) errs.email = "Enter your email address.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim())) errs.email = "That email address isn't valid.";
+    if (!form.password) errs.password = "Enter your password.";
     return errs;
   }
 
@@ -44,7 +43,7 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok) { setError(data.error); return; }
+      if (!res.ok) { setError(data.error ?? "Couldn't sign you in. Please try again."); return; }
       await refresh();
       router.push("/");
     } catch {
@@ -55,213 +54,147 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen bg-white sm:bg-[#F7F8FA] flex flex-col">
 
-      {/* ── DESKTOP: left farm photo panel (lg+) ── */}
-      <div className="hidden lg:block relative w-1/2">
-        <Image
-          src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=1200&q=80"
-          alt="Fresh farm produce" fill className="object-cover" priority
-        />
-        <div className="absolute inset-0 bg-green-900/60" />
-        <div className="absolute inset-0 flex flex-col justify-between p-12 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-sm">
+      {/* top bar — only visible on desktop */}
+      <div className="hidden sm:flex items-center justify-between px-8 py-5">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+            <Sprout className="w-4.5 h-4.5 text-white" />
+          </div>
+          <span className="text-[15px] font-semibold text-slate-900">FarmFresh</span>
+        </Link>
+        <Link href="/auth/register"
+          className="text-[13px] font-medium text-slate-600 hover:text-slate-900 transition-colors">
+          Create account
+        </Link>
+      </div>
+
+      {/* center card */}
+      <div className="flex-1 flex items-start sm:items-center justify-center px-0 sm:px-4 py-0 sm:py-8">
+        <div className="w-full sm:max-w-[400px] bg-white sm:border sm:border-[#E5E7EB] sm:rounded-2xl sm:shadow-[0_1px_2px_rgba(0,0,0,0.05),0_8px_24px_rgba(0,0,0,0.04)] px-6 sm:px-10 pt-10 sm:pt-10 pb-10">
+
+          {/* brand mark */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-11 h-11 bg-green-600 rounded-xl flex items-center justify-center mb-4">
               <Sprout className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <p className="font-bold text-lg leading-tight">FarmFresh</p>
-              <p className="text-xs text-white/70">Organic &amp; Hydroponic</p>
-            </div>
+            <h1 className="text-[22px] font-semibold text-[#111827] tracking-[-0.3px]">Sign in</h1>
+            <p className="text-[14px] text-[#6B7280] mt-1">Use your FarmFresh account</p>
           </div>
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold leading-snug drop-shadow">
-              Welcome back to<br />your farm family.
-            </h1>
-            <p className="text-white/80 text-sm leading-relaxed max-w-sm">
-              Sign in to manage your orders, track deliveries, and enjoy fresh organic produce delivered straight from our farms.
-            </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              {["100% Organic", "Zero Pesticides", "Farm Fresh", "Fast Delivery", "Hydroponic"].map((tag) => (
-                <span key={tag} className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs text-white/90 border border-white/20">{tag}</span>
-              ))}
-            </div>
-          </div>
-          <p className="text-xs text-white/40">&copy; 2026 FarmFresh. All rights reserved.</p>
-        </div>
-      </div>
 
-      {/* ── DESKTOP: right form panel (lg+) ── */}
-      <div className="hidden lg:flex flex-1 items-center justify-center px-6 py-6 bg-[#F8FAFC]">
-        <div className="w-full max-w-sm space-y-5">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">Welcome back</h2>
-            <p className="text-sm text-slate-500 mt-0.5">Sign in to your account</p>
-          </div>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-            <DesktopForm
-              form={form} set={set} showPw={showPw} setShowPw={setShowPw}
-              loading={loading} error={error} fieldErrors={fieldErrors}
-              onSubmit={handleSubmit}
-            />
-          </div>
-          <p className="text-center text-sm text-slate-500">
-            New to FarmFresh?{" "}
-            <Link href="/auth/register" className="text-green-600 font-semibold hover:text-green-700">Create account</Link>
-          </p>
-        </div>
-      </div>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
-      {/* ── MOBILE layout (hidden on lg+) ── */}
-      <div className="flex lg:hidden flex-col w-full min-h-screen">
-
-        {/* Green hero header */}
-        <div className="relative bg-gradient-to-br from-green-600 via-green-500 to-emerald-400 px-6 pt-12 pb-10 flex-shrink-0">
-          {/* Decorative circles */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4" />
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/4" />
-
-          <div className="relative">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-5 backdrop-blur-sm border border-white/30">
-              <Sprout className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-white leading-tight">Welcome back!</h1>
-            <p className="text-white/80 text-sm mt-1">Sign in to FarmFresh</p>
-
-            {/* Trust badges */}
-            <div className="flex gap-3 mt-5">
-              {[
-                { icon: Leaf,       label: "100% Organic" },
-                { icon: Truck,      label: "Fast Delivery" },
-                { icon: ShieldCheck, label: "Secure" },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
-                  <Icon className="w-3 h-3 text-white" />
-                  <span className="text-[11px] font-semibold text-white">{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* White form sheet */}
-        <div className="flex-1 bg-white rounded-t-3xl -mt-5 px-6 pt-7 pb-8 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <h2 className="text-lg font-bold text-slate-900 mb-5">Sign in to your account</h2>
-
-          <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Email */}
+            {/* email */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Email address</label>
+              <label htmlFor="email" className="block text-[13px] font-medium text-[#374151]">
+                Email address
+              </label>
               <input
+                id="email"
                 type="email"
+                autoComplete="email"
                 value={form.email}
                 onChange={set("email")}
                 placeholder="you@example.com"
-                autoComplete="email"
-                className={`w-full h-12 px-4 rounded-xl border text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                  fieldErrors.email
-                    ? "border-red-400 focus:ring-red-500/20"
-                    : "border-slate-200 focus:ring-green-500/30 focus:border-green-400"
-                }`}
+                className={inputCls(!!fieldErrors.email)}
               />
-              {fieldErrors.email && <p className="text-xs text-red-500">{fieldErrors.email}</p>}
+              {fieldErrors.email && <p className="text-[12px] text-red-500 mt-1">{fieldErrors.email}</p>}
             </div>
 
-            {/* Password */}
+            {/* password */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Password</label>
-                <Link href="/auth/forgot-password" className="text-xs text-green-600 font-medium">Forgot password?</Link>
+                <label htmlFor="password" className="block text-[13px] font-medium text-[#374151]">
+                  Password
+                </label>
+                <Link href="/auth/forgot-password"
+                  className="text-[13px] text-green-600 hover:text-green-700 font-medium transition-colors">
+                  Forgot password?
+                </Link>
               </div>
               <div className="relative">
                 <input
+                  id="password"
                   type={showPw ? "text" : "password"}
+                  autoComplete="current-password"
                   value={form.password}
                   onChange={set("password")}
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  className={`w-full h-12 px-4 pr-12 rounded-xl border text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                    fieldErrors.password
-                      ? "border-red-400 focus:ring-red-500/20"
-                      : "border-slate-200 focus:ring-green-500/30 focus:border-green-400"
-                  }`}
+                  placeholder="••••••••"
+                  className={`${inputCls(!!fieldErrors.password)} pr-11`}
                 />
-                <button type="button" onClick={() => setShowPw(!showPw)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <button
+                  type="button"
+                  onClick={() => setShowPw((v) => !v)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#9CA3AF] hover:text-[#6B7280] transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPw ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                 </button>
               </div>
-              {fieldErrors.password && <p className="text-xs text-red-500">{fieldErrors.password}</p>}
+              {fieldErrors.password && <p className="text-[12px] text-red-500 mt-1">{fieldErrors.password}</p>}
             </div>
 
+            {/* server error */}
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-                <p className="text-xs text-red-600">{error}</p>
-              </div>
+              <p className="text-[13px] text-red-600 bg-red-50 border border-red-100 rounded-lg px-3.5 py-2.5 leading-snug">
+                {error}
+              </p>
             )}
 
-            <button type="submit" disabled={loading}
-              className="w-full h-12 bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-60 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 mt-2 text-sm shadow-sm shadow-green-200"
+            {/* submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-[46px] bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-55 text-white text-[15px] font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 mt-1"
             >
-              {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing in...</> : "Sign in"}
+              {loading
+                ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Signing in…</span></>
+                : "Sign in"}
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
-            New to FarmFresh?{" "}
-            <Link href="/auth/register" className="text-green-600 font-semibold">Create account</Link>
-          </p>
+          {/* divider */}
+          <div className="relative my-7">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#E5E7EB]" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="bg-white px-3 text-[12px] text-[#9CA3AF]">New to FarmFresh?</span>
+            </div>
+          </div>
+
+          <Link
+            href="/auth/register"
+            className="flex items-center justify-center w-full h-[42px] border border-[#D1D5DB] hover:border-[#9CA3AF] text-[14px] font-medium text-[#374151] rounded-lg transition-colors"
+          >
+            Create account
+          </Link>
         </div>
       </div>
+
+      {/* footer */}
+      <footer className="py-5 px-8">
+        <p className="text-center text-[12px] text-[#9CA3AF]">
+          &copy; 2026 FarmFresh &middot;{" "}
+          <Link href="/privacy" className="hover:text-[#6B7280] transition-colors">Privacy</Link>
+          {" "}&middot;{" "}
+          <Link href="/terms" className="hover:text-[#6B7280] transition-colors">Terms</Link>
+          {" "}&middot;{" "}
+          <Link href="/help" className="hover:text-[#6B7280] transition-colors">Help</Link>
+        </p>
+      </footer>
     </div>
   );
 }
 
-/* Shared desktop form component */
-function DesktopForm({
-  form, set, showPw, setShowPw, loading, error, fieldErrors, onSubmit,
-}: {
-  form: { email: string; password: string };
-  set: (k: "email" | "password") => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  showPw: boolean;
-  setShowPw: (v: boolean) => void;
-  loading: boolean;
-  error: string;
-  fieldErrors: FieldErrors;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}) {
-  const fc = (f: keyof FieldErrors) =>
-    `w-full h-10 px-3 rounded-xl border text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-      fieldErrors[f] ? "border-red-400 focus:ring-red-500/20" : "border-slate-200 focus:ring-green-500/30 focus:border-green-400"
-    }`;
-
-  return (
-    <form onSubmit={onSubmit} noValidate className="space-y-3">
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-slate-700">Email address <span className="text-red-500">*</span></label>
-        <input type="email" value={form.email} onChange={set("email")} placeholder="you@example.com" className={fc("email")} />
-        {fieldErrors.email && <p className="text-[11px] text-red-500">{fieldErrors.email}</p>}
-      </div>
-      <div className="space-y-1">
-        <label className="text-xs font-semibold text-slate-700">Password <span className="text-red-500">*</span></label>
-        <div className="relative">
-          <input type={showPw ? "text" : "password"} value={form.password} onChange={set("password")} placeholder="Enter your password"
-            className={`${fc("password")} pr-10`} />
-          <button type="button" onClick={() => setShowPw(!showPw)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-            {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-        {fieldErrors.password && <p className="text-[11px] text-red-500">{fieldErrors.password}</p>}
-      </div>
-      <div className="flex justify-end">
-        <Link href="/auth/forgot-password" className="text-xs text-green-600 hover:text-green-700 font-medium">Forgot password?</Link>
-      </div>
-      {error && <p className="text-xs text-red-600 bg-red-50 border border-red-100 px-3 py-2 rounded-lg">{error}</p>}
-      <button type="submit" disabled={loading}
-        className="w-full h-10 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer">
-        {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Signing in...</> : "Sign in"}
-      </button>
-    </form>
-  );
+function inputCls(hasError: boolean) {
+  return [
+    "block w-full h-[46px] rounded-lg border px-3.5 text-[15px] text-[#111827]",
+    "placeholder-[#9CA3AF] bg-white",
+    "focus:outline-none focus:ring-1 transition-[border-color,box-shadow]",
+    hasError
+      ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+      : "border-[#D1D5DB] focus:border-green-500 focus:ring-green-500/20",
+  ].join(" ");
 }
