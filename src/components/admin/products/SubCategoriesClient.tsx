@@ -86,7 +86,7 @@ export default function SubCategoriesClient({
         body: JSON.stringify({ id }),
       });
       const d = await res.json();
-      if (!res.ok) { alert(d.error); return; }
+      if (!res.ok) { setFormError(d.error ?? "Delete failed."); return; }
       setSubs((p) => p.filter((s) => s.id !== id));
       startTransition(() => router.refresh());
     } finally { setDeletingId(null); }
@@ -179,7 +179,7 @@ export default function SubCategoriesClient({
                   <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <Tag className="w-3.5 h-3.5" /> Name *
                   </label>
-                  <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  <input value={form.name} onChange={(e) => { setForm((f) => ({ ...f, name: e.target.value })); setFormError(""); }}
                     placeholder="e.g. Leafy Vegetables" maxLength={50} required
                     className="w-full h-10 px-3 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400 transition-all" />
                   {form.name && (

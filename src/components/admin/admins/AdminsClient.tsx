@@ -136,6 +136,8 @@ export default function AdminsClient({
 
   const [adding, setAdding]   = useState(false);
   const [editing, setEditing] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [editError, setEditError]     = useState("");
   const [toast, setToast]     = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   useEffect(() => {
@@ -167,6 +169,13 @@ export default function AdminsClient({
   /* ── Create ── */
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setCreateError("");
+    if (!form.name.trim()) { setCreateError("Full name is required."); return; }
+    if (!form.email.trim()) { setCreateError("Email is required."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { setCreateError("Enter a valid email address."); return; }
+    if (!form.password) { setCreateError("Password is required."); return; }
+    if (form.password.length < 6) { setCreateError("Password must be at least 6 characters."); return; }
+    if (form.role === "admin" && !form.branchId) { setCreateError("Please assign a branch for this admin."); return; }
     setAdding(true);
     try {
       const res = await fetch("/api/admin/admins", {
@@ -178,7 +187,7 @@ export default function AdminsClient({
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setToast({ type: "error", message: data.error }); return; }
+      if (!res.ok) { setCreateError(data.error ?? "Something went wrong."); return; }
       setAdmins((prev) => [...prev, {
         id: data.admin.id, name: data.admin.name, email: data.admin.email,
         role: data.admin.role, branchId: data.admin.branch_id ?? null,
@@ -188,10 +197,11 @@ export default function AdminsClient({
       }]);
       setForm(emptyForm);
       setShowCreate(false);
+      setCreateError("");
       setToast({ type: "success", message: `Admin "${data.admin.name}" created successfully!` });
       setTimeout(() => setToast(null), 3000);
       startTransition(() => router.refresh());
-    } catch { setToast({ type: "error", message: "Something went wrong." }); }
+    } catch { setCreateError("Something went wrong. Please try again."); }
     finally { setAdding(false); }
   };
 
@@ -227,6 +237,10 @@ export default function AdminsClient({
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingAdmin) return;
+    setEditError("");
+    if (!editForm.name.trim()) { setEditError("Full name is required."); return; }
+    if (!editForm.email.trim()) { setEditError("Email is required."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editForm.email)) { setEditError("Enter a valid email address."); return; }
     setEditing(true);
     try {
       const res = await fetch("/api/admin/admins", {
@@ -238,7 +252,7 @@ export default function AdminsClient({
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setToast({ type: "error", message: data.error }); return; }
+      if (!res.ok) { setEditError(data.error ?? "Something went wrong."); return; }
       setAdmins((prev) => prev.map((a) => a.id === editingAdmin.id ? {
         id: data.admin.id, name: data.admin.name, email: data.admin.email,
         role: data.admin.role, branchId: data.admin.branch_id ?? null,
@@ -246,10 +260,11 @@ export default function AdminsClient({
         secondaryPhone: data.admin.secondary_phone ?? null,
         createdAt: new Date(data.admin.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }),
       } : a));
+      setEditError("");
       setToast({ type: "success", message: `Admin "${data.admin.name}" updated!` });
       setTimeout(() => { setEditingAdmin(null); setToast(null); }, 2000);
       startTransition(() => router.refresh());
-    } catch { setToast({ type: "error", message: "Something went wrong." }); }
+    } catch { setEditError("Something went wrong. Please try again."); }
     finally { setEditing(false); }
   };
 
@@ -302,7 +317,7 @@ export default function AdminsClient({
           <p className="text-sm text-slate-400 mt-0.5">{admins.length} account{admins.length !== 1 ? "s" : ""} · Manage who has access to this panel</p>
         </div>
         <button
-          onClick={() => { setForm(emptyForm); setShowPw(false); setShowCreate(true); }}
+          onClick={() => { setForm(emptyForm); setShowPw(false); setCreateError(""); setShowCreate(true); }}
           className="flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors shadow-sm"
         >
           <Plus className="w-4 h-4" /> Add Admin
@@ -696,8 +711,11 @@ export default function AdminsClient({
                 </p>
               </div>
 
+              {createError && (
+                <p className="text-xs text-red-600 bg-red-50 border border-red-100 px-3 py-2.5 rounded-lg">{createError}</p>
+              )}
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setShowCreate(false)}
+                <button type="button" onClick={() => { setShowCreate(false); setCreateError(""); }}
                   className="flex-1 h-9 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-200 transition-colors"
                 >Cancel</button>
                 <button type="submit" disabled={adding}
@@ -768,8 +786,11 @@ export default function AdminsClient({
                 <RoleButtons role={editForm.role} onChange={(r) => setEditForm((p) => ({ ...p, role: r }))} disabled={currentAdminRole !== "superadmin"} />
               </div>
 
+              {editError && (
+                <p className="text-xs text-red-600 bg-red-50 border border-red-100 px-3 py-2.5 rounded-lg">{editError}</p>
+              )}
               <div className="flex gap-3 pt-1">
-                <button type="button" onClick={() => setEditingAdmin(null)}
+                <button type="button" onClick={() => { setEditingAdmin(null); setEditError(""); }}
                   className="flex-1 h-9 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-200 transition-colors"
                 >Cancel</button>
                 <button type="submit" disabled={editing}

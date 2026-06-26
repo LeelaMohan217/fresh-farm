@@ -68,10 +68,9 @@ export default function BulkOrderForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.deliveryDate || !form.itemsDesc || !form.quantityDesc) {
-      setError("Please fill in all fields.");
-      return;
-    }
+    if (!form.deliveryDate) { setError("Please select a delivery date."); return; }
+    if (!form.itemsDesc.trim()) { setError("Please describe the items needed."); return; }
+    if (!form.quantityDesc.trim()) { setError("Please provide quantity or portion details."); return; }
     setError("");
     setSubmitting(true);
     try {
