@@ -5,8 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ShoppingCart, Sprout, LogOut, ChevronDown,
-  Menu, X, Search, TrendingUp, Tag, ArrowRight,
-  User, MapPin, ShoppingBag, Settings,
+  X, Search, TrendingUp, Tag, ArrowRight,
+  User, MapPin, ShoppingBag, Settings, ClipboardList,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
@@ -394,59 +394,109 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu drawer */}
+      {/* ── Mobile account bottom sheet ── */}
       {menuOpen && (
-        <div className="md:hidden border-t border-slate-100 bg-white px-4 py-3 space-y-1">
-          <Link href="/" onClick={() => setMenuOpen(false)}
-            className={cn("flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-              pathname === "/" ? "bg-green-50 text-green-700" : "text-slate-700 hover:bg-green-50 hover:text-green-700")}
-          >
-            Home
-          </Link>
-          <Link href="/shop" onClick={() => setMenuOpen(false)}
-            className={cn("flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-              pathname === "/shop" ? "bg-green-50 text-green-700" : "text-slate-700 hover:bg-green-50 hover:text-green-700")}
-          >
-            Shop
-          </Link>
-          <Link href="/showcase" onClick={() => setMenuOpen(false)}
-            className={cn("flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-              pathname === "/showcase" ? "bg-green-50 text-green-700" : "text-slate-700 hover:bg-green-50 hover:text-green-700")}
-          >
-            Showcase
-          </Link>
-          <Link href="/services" onClick={() => setMenuOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-          >
-            Services
-          </Link>
-          <div className="pt-2 border-t border-slate-100 mt-2">
+        <div className="md:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={() => setMenuOpen(false)}
+          />
+
+          {/* Sheet */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl">
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-9 h-1 bg-slate-200 rounded-full" />
+            </div>
+
             {user ? (
               <>
-                <div className="flex items-center gap-2.5 px-3 py-2.5">
-                  <div className="w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">{getInitials(user.name)}</div>
-                  <div><p className="text-sm font-semibold text-slate-800">{user.name}</p><p className="text-[11px] text-slate-400">{user.email}</p></div>
-                </div>
-                {[
-                  { href: "/account/profile",  icon: User,        label: "My Profile"      },
-                  { href: "/account/orders",    icon: ShoppingBag, label: "My Orders"       },
-                  { href: "/account/addresses", icon: MapPin,      label: "Saved Addresses" },
-                ].map(({ href, icon: Icon, label }) => (
-                  <Link key={href} href={href} onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                {/* User header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                      {getInitials(user.name)}
+                    </div>
+                    <div>
+                      <p className="text-[15px] font-semibold text-slate-900">{user.name}</p>
+                      <p className="text-[13px] text-slate-500">{user.email}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500"
                   >
-                    <Icon className="w-4 h-4" /> {label}
-                  </Link>
-                ))}
-                <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors">
-                  <LogOut className="w-4 h-4" /> Logout
-                </button>
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Account links */}
+                <div className="px-3 pt-2 pb-1">
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-3 py-2">
+                    Your Information
+                  </p>
+                  {[
+                    { href: "/account/profile",   icon: User,         label: "Profile"          },
+                    { href: "/account/orders",     icon: ClipboardList,label: "Order History"    },
+                    { href: "/account/addresses",  icon: MapPin,       label: "Address Book"     },
+                    { href: "/account/settings",   icon: Settings,     label: "Account Privacy"  },
+                  ].map(({ href, icon: Icon, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-4 px-3 py-3 rounded-xl transition-colors",
+                        pathname === href ? "bg-green-50 text-green-700" : "text-slate-700 hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                        <Icon className="w-[18px] h-[18px] text-slate-500" />
+                      </div>
+                      <span className="text-[15px] font-medium">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Logout */}
+                <div className="px-3 pt-1 pb-8 border-t border-slate-100 mt-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-700 hover:bg-red-50 transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                      <LogOut className="w-[18px] h-[18px] text-slate-500" />
+                    </div>
+                    <span className="text-[15px] font-medium">Logout</span>
+                  </button>
+                </div>
               </>
             ) : (
-              <div className="flex gap-2">
-                <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="flex-1 text-center py-2.5 text-sm font-medium border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50">Login</Link>
-                <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="flex-1 text-center py-2.5 text-sm font-semibold bg-green-600 text-white rounded-xl hover:bg-green-700">Register</Link>
-              </div>
+              <>
+                <div className="flex items-center justify-between px-5 pt-4 pb-3">
+                  <h3 className="text-[17px] font-semibold text-slate-900">Welcome to FarmFresh</h3>
+                  <button
+                    onClick={() => setMenuOpen(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-[14px] text-slate-500 px-5 pb-5">
+                  Sign in to view your orders and manage your account.
+                </p>
+                <div className="flex gap-3 px-5 pb-10">
+                  <Link href="/auth/login" onClick={() => setMenuOpen(false)}
+                    className="flex-1 text-center py-3 text-[15px] font-semibold border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors">
+                    Sign in
+                  </Link>
+                  <Link href="/auth/register" onClick={() => setMenuOpen(false)}
+                    className="flex-1 text-center py-3 text-[15px] font-semibold bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
+                    Create account
+                  </Link>
+                </div>
+              </>
             )}
           </div>
         </div>
