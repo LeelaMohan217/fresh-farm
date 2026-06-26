@@ -26,7 +26,10 @@ export async function GET(req: NextRequest) {
     const { rows } = await pool.query(
       `SELECT query FROM search_logs ORDER BY count DESC, last_searched_at DESC LIMIT 8`
     );
-    return NextResponse.json({ trending: rows.map((r) => r.query as string), categories: [], products: [], suggestions: [] });
+    return NextResponse.json(
+      { trending: rows.map((r) => r.query as string), categories: [], products: [], suggestions: [] },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   }
 
   if (log) {
@@ -62,21 +65,24 @@ export async function GET(req: NextRequest) {
     ),
   ]);
 
-  return NextResponse.json({
-    trending: [],
-    categories: catRes.rows.map((c) => ({ id: c.id as number, name: c.name as string, slug: c.slug as string })),
-    products: prodRes.rows.map((r) => ({
-      id: r.id as number,
-      name: r.name as string,
-      price: Number(r.price),
-      unit: r.unit as string,
-      stock: r.stock as number,
-      imageUrl: (r.image_url ?? null) as string | null,
-      categoryName: r.category_name as string,
-      categorySlug: r.category_slug as string,
-    })),
-    suggestions: sugRes.rows
-      .map((r) => r.query as string)
-      .filter((s) => s.toLowerCase() !== q.toLowerCase()),
-  });
+  return NextResponse.json(
+    {
+      trending: [],
+      categories: catRes.rows.map((c) => ({ id: c.id as number, name: c.name as string, slug: c.slug as string })),
+      products: prodRes.rows.map((r) => ({
+        id: r.id as number,
+        name: r.name as string,
+        price: Number(r.price),
+        unit: r.unit as string,
+        stock: r.stock as number,
+        imageUrl: (r.image_url ?? null) as string | null,
+        categoryName: r.category_name as string,
+        categorySlug: r.category_slug as string,
+      })),
+      suggestions: sugRes.rows
+        .map((r) => r.query as string)
+        .filter((s) => s.toLowerCase() !== q.toLowerCase()),
+    },
+    { headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120" } }
+  );
 }

@@ -38,31 +38,34 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     ),
   ]);
 
-  if (!productRes.rows.length) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!productRes.rows.length) return NextResponse.json({ error: "Not found" }, { status: 404, headers: { "Cache-Control": "no-store" } });
 
   const p = productRes.rows[0];
   const imageUrls: string[] = Array.isArray(p.image_urls) && p.image_urls.length > 0
     ? p.image_urls
     : p.image_url ? [p.image_url] : [];
 
-  return NextResponse.json({
-    product: {
-      id: p.id, name: p.name, description: p.description ?? "",
-      price: Number(p.price), unit: p.unit, stock: p.stock,
-      imageUrls, categoryId: p.category_id,
-      categoryName: p.category_name, categorySlug: p.category_slug,
+  return NextResponse.json(
+    {
+      product: {
+        id: p.id, name: p.name, description: p.description ?? "",
+        price: Number(p.price), unit: p.unit, stock: p.stock,
+        imageUrls, categoryId: p.category_id,
+        categoryName: p.category_name, categorySlug: p.category_slug,
+      },
+      similar: similarRes.rows.map((s) => ({
+        id: s.id, name: s.name, price: Number(s.price), unit: s.unit, stock: s.stock,
+        imageUrl: s.image_url ?? null,
+        imageUrls: Array.isArray(s.image_urls) && s.image_urls.length > 0 ? s.image_urls : s.image_url ? [s.image_url] : [],
+        categorySlug: s.category_slug, categoryName: s.category_name,
+      })),
+      topInCategory: topRes.rows.map((s) => ({
+        id: s.id, name: s.name, price: Number(s.price), unit: s.unit, stock: s.stock,
+        imageUrl: s.image_url ?? null,
+        imageUrls: Array.isArray(s.image_urls) && s.image_urls.length > 0 ? s.image_urls : s.image_url ? [s.image_url] : [],
+        categorySlug: s.category_slug, categoryName: s.category_name,
+      })),
     },
-    similar: similarRes.rows.map((s) => ({
-      id: s.id, name: s.name, price: Number(s.price), unit: s.unit, stock: s.stock,
-      imageUrl: s.image_url ?? null,
-      imageUrls: Array.isArray(s.image_urls) && s.image_urls.length > 0 ? s.image_urls : s.image_url ? [s.image_url] : [],
-      categorySlug: s.category_slug, categoryName: s.category_name,
-    })),
-    topInCategory: topRes.rows.map((s) => ({
-      id: s.id, name: s.name, price: Number(s.price), unit: s.unit, stock: s.stock,
-      imageUrl: s.image_url ?? null,
-      imageUrls: Array.isArray(s.image_urls) && s.image_urls.length > 0 ? s.image_urls : s.image_url ? [s.image_url] : [],
-      categorySlug: s.category_slug, categoryName: s.category_name,
-    })),
-  });
+    { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
+  );
 }

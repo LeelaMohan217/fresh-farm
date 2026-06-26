@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 300; // re-generate at most every 5 minutes
 
 import pool from "@/lib/pg";
 import Link from "next/link";
