@@ -1,29 +1,26 @@
+export const dynamic = "force-dynamic";
+
 import pool from "@/lib/pg";
 import Link from "next/link";
-import { unstable_cache } from "next/cache";
 import {
   Droplets, Wind, CheckCircle2, ArrowRight, Phone, Mail, Wrench,
 } from "lucide-react";
 
-const getServices = unstable_cache(
-  async () => {
-    const { rows } = await pool.query(`
-      SELECT id, name, type, price, description
-      FROM services
-      WHERE status = 'Active' AND type IN ('Hydroponic','Aeroponic')
-      ORDER BY type ASC
-    `);
-    return rows.map((s) => ({
-      id: s.id as number,
-      name: s.name as string,
-      type: s.type as string,
-      price: Number(s.price),
-      description: (s.description ?? "") as string,
-    }));
-  },
-  ["services-data"],
-  { tags: ["services"] }
-);
+async function getServices() {
+  const { rows } = await pool.query(`
+    SELECT id, name, type, price, description
+    FROM services
+    WHERE status = 'Active' AND type IN ('Hydroponic','Aeroponic')
+    ORDER BY type ASC
+  `);
+  return rows.map((s) => ({
+    id: s.id as number,
+    name: s.name as string,
+    type: s.type as string,
+    price: Number(s.price),
+    description: (s.description ?? "") as string,
+  }));
+}
 
 const META = {
   Hydroponic: {
