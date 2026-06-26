@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,22 +15,24 @@ export async function POST(req: NextRequest) {
     if (!allowedTypes.includes(file.type))
       return NextResponse.json({ error: "Only JPG, PNG or WebP images are allowed." }, { status: 400 });
 
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize)
       return NextResponse.json({ error: "Image must be under 5MB." }, { status: 400 });
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Sanitise filename and make it unique
-    const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const safeName = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { folder: "farmfresh/products", resource_type: "image" },
+        (error, result) => {
+          if (error || !result) reject(error ?? new Error("Upload failed"));
+          else resolve(result as { secure_url: string });
+        }
+      ).end(buffer);
+    });
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(path.join(uploadDir, safeName), buffer);
-
-    return NextResponse.json({ url: `/uploads/products/${safeName}` });
+    return NextResponse.json({ url: result.secure_url });
   } catch (e) {
     console.error("UPLOAD ERROR:", e);
     return NextResponse.json({ error: "Upload failed." }, { status: 500 });
