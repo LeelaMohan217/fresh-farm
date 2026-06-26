@@ -361,7 +361,7 @@ export default function OrderDetailPage() {
               Cancel order
             </button>
             {order.status === "Shipped" && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 bg-slate-800 text-white text-xs rounded-lg px-3 py-2 hidden group-hover:block z-10 text-center">
                 Cannot cancel — order is already shipped
               </div>
             )}
