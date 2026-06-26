@@ -1,9 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import pool from "@/lib/pg";
 import { getSession } from "@/lib/auth";
 import CategoryShopSection from "@/components/user/CategoryShopSection";
-
-export const dynamic = "force-dynamic";
 
 export default async function CategoryPage({
   params,

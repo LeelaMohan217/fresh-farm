@@ -1,7 +1,7 @@
+export const dynamic = "force-dynamic";
+
 import pool from "@/lib/pg";
 import ServiceDetailClient from "@/components/user/ServiceDetail";
-
-export const dynamic = "force-dynamic";
 
 export default async function AeroponicPage() {
   const { rows } = await pool.query(

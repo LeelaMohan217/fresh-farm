@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import pool from "@/lib/pg";
 import Link from "next/link";
 import Image from "next/image";
-
-export const dynamic = "force-dynamic";
 
 const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1506484381205-f7945653044d?w=400&h=300&fit=crop";
 
