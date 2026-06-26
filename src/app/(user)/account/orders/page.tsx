@@ -238,7 +238,7 @@ export default function OrdersPage() {
 
                     {/* Actions */}
                     <div className="flex justify-end gap-2 pt-1">
-                      {(o.status === "Delivered" || o.status === "Cancelled") && (
+                      {(o.status === "Pending" || o.status === "Processing") && (
                         <button
                           onClick={() => handleReorder(o.id)}
                           disabled={reordering === o.id}

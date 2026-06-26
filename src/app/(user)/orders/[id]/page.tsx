@@ -342,7 +342,7 @@ export default function OrderDetailPage() {
           className="px-6 py-2.5 bg-green-600 text-white text-sm font-semibold rounded-xl hover:bg-green-700 transition-colors cursor-pointer">
           Continue shopping
         </button>
-        {(order.status === "Delivered" || order.status === "Cancelled") && (
+        {(order.status === "Pending" || order.status === "Processing") && (
           <button
             onClick={handleReorder}
             disabled={reordering}
