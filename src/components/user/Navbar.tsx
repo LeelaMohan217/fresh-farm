@@ -295,10 +295,12 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Row 2: Full-width search bar */}
-        <div className="px-3 pb-3">
-          <SearchBar />
-        </div>
+        {/* Row 2: Full-width search bar — hidden on cart page */}
+        {pathname !== "/cart" && (
+          <div className="px-3 pb-3">
+            <SearchBar />
+          </div>
+        )}
       </div>
 
       {/* ── DESKTOP layout (hidden on mobile) ── */}

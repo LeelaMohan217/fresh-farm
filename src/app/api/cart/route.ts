@@ -7,7 +7,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { rows } = await pool.query(
-    `SELECT p.id, p.name, p.price, p.unit, ci.quantity
+    `SELECT p.id, p.name, p.price, p.unit, p.image_url, p.image_urls, ci.quantity
      FROM cart_items ci
      JOIN customers c ON c.id = ci.customer_id
      JOIN products p ON p.id = ci.product_id
@@ -23,6 +23,7 @@ export async function GET() {
       price: Number(r.price),
       unit: r.unit,
       quantity: r.quantity,
+      imageUrl: (r.image_urls?.[0]) || r.image_url || null,
     }))
   );
 }
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   );
 
   const { rows } = await pool.query(
-    `SELECT p.id, p.name, p.price, p.unit, ci.quantity
+    `SELECT p.id, p.name, p.price, p.unit, p.image_url, p.image_urls, ci.quantity
      FROM cart_items ci
      JOIN products p ON p.id = ci.product_id
      WHERE ci.customer_id = $1 AND ci.product_id = $2`,
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest) {
     price: Number(item.price),
     unit: item.unit,
     quantity: item.quantity,
+    imageUrl: (item.image_urls?.[0]) || item.image_url || null,
   });
 }
 
