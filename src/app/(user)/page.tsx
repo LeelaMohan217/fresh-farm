@@ -154,7 +154,7 @@ export default async function HomePage() {
         <section className="bg-white border-b border-slate-100 py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="mb-5">
-              <h2 className="text-[14px] font-semibold text-slate-900">Shop by Category</h2>
+              <h2 className="text-[14px] font-bold text-slate-900">Shop by Category</h2>
             </div>
             <CategoryGrid categories={topCategories} />
           </div>
@@ -167,12 +167,12 @@ export default async function HomePage() {
           <section key={sec.id} className="bg-white border-b border-slate-100 py-6">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-900">{sec.name}</h2>
+                <h2 className="text-[14px] font-bold text-slate-900">{sec.name}</h2>
                 <Link
                   href={`/shop/category/${sec.slug}`}
-                  className="text-sm font-bold text-green-600 hover:text-green-700 transition-colors"
+                  className="text-[13px] font-semibold text-green-600 hover:text-green-700 transition-colors"
                 >
-                  see all
+                  See all
                 </Link>
               </div>
 
@@ -180,16 +180,6 @@ export default async function HomePage() {
                 {sec.products.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
-                <Link
-                  href={`/shop/category/${sec.slug}`}
-                  className="flex-shrink-0 w-36 sm:w-44 rounded-2xl border-2 border-dashed border-green-200 hover:border-green-400 hover:bg-green-50/50 transition-all flex flex-col items-center justify-center gap-2 text-green-600 group"
-                  style={{ minHeight: 200 }}
-                >
-                  <div className="w-10 h-10 rounded-full bg-green-100 group-hover:bg-green-200 flex items-center justify-center transition-colors">
-                    <ArrowRight className="w-5 h-5" />
-                  </div>
-                  <p className="text-sm font-bold text-center leading-tight">See all<br />{sec.name}</p>
-                </Link>
               </div>
             </div>
           </section>
