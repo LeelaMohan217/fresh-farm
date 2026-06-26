@@ -54,6 +54,7 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError]     = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Pre-populate images from existing image_urls
   const [images, setImages] = useState<ImageEntry[]>(() =>
@@ -79,7 +80,10 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
 
   const set = (key: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => setForm((prev) => ({ ...prev, [key]: e.target.value }));
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+    setFieldErrors((prev) => ({ ...prev, [key]: "" }));
+  };
 
   const anyUploading = images.some((i) => i.uploading);
 
@@ -148,7 +152,15 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (anyUploading) return;
+
+    const errs: Record<string, string> = {};
+    if (!form.name.trim()) errs.name = "Product name is required.";
+    if (!form.price || parseFloat(form.price) <= 0) errs.price = "Enter a valid price.";
+    if (!form.categoryId) errs.categoryId = "Please select a category.";
+    if (Object.keys(errs).length > 0) { setFieldErrors(errs); return; }
+
     setError("");
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -338,10 +350,11 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
               <Package className="w-3.5 h-3.5 text-slate-400" /> Product Name *
             </label>
             <input
-              required value={form.name} onChange={set("name")}
+              value={form.name} onChange={set("name")}
               placeholder="e.g. Organic Spinach"
-              className="w-full h-10 px-3 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400 transition-all"
+              className={`w-full h-10 px-3 text-sm bg-slate-50 border rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400 transition-all ${fieldErrors.name ? "border-red-400 bg-red-50/30" : "border-slate-200"}`}
             />
+            {fieldErrors.name && <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>}
           </div>
 
           <div className="space-y-1.5">
@@ -366,11 +379,12 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
                 <IndianRupee className="w-3.5 h-3.5 text-slate-400" /> Price (₹) *
               </label>
               <input
-                required type="number" min="0" step="0.01"
+                type="number" min="0" step="0.01"
                 value={form.price} onChange={set("price")}
                 placeholder="0.00"
-                className="w-full h-10 px-3 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400 transition-all"
+                className={`w-full h-10 px-3 text-sm bg-slate-50 border rounded-lg text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500/30 focus:border-green-400 transition-all ${fieldErrors.price ? "border-red-400 bg-red-50/30" : "border-slate-200"}`}
               />
+              {fieldErrors.price && <p className="text-xs text-red-500 mt-1">{fieldErrors.price}</p>}
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
@@ -395,17 +409,19 @@ export default function EditProductForm({ categories, branches = [], isBranchAdm
                 <Layers className="w-3.5 h-3.5 text-slate-400" /> Category *
               </label>
               {categories.length > 0 ? (
-                <CustomSelect
-                  required
-                  value={form.categoryId}
-                  onChange={(v) => setForm((p) => ({ ...p, categoryId: v }))}
-                  placeholder="Select category"
-                  options={categories.map((c) => ({
-                    value: String(c.id),
-                    label: c.name,
-                    emoji: CATEGORY_EMOJI[c.name] ?? "📦",
-                  }))}
-                />
+                <>
+                  <CustomSelect
+                    value={form.categoryId}
+                    onChange={(v) => { setForm((p) => ({ ...p, categoryId: v })); setFieldErrors((p) => ({ ...p, categoryId: "" })); }}
+                    placeholder="Select category"
+                    options={categories.map((c) => ({
+                      value: String(c.id),
+                      label: c.name,
+                      emoji: CATEGORY_EMOJI[c.name] ?? "📦",
+                    }))}
+                  />
+                  {fieldErrors.categoryId && <p className="text-xs text-red-500 mt-1">{fieldErrors.categoryId}</p>}
+                </>
               ) : (
                 <div className="h-10 px-3 flex items-center text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg">
                   No categories —{" "}

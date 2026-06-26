@@ -142,7 +142,7 @@ export default function ProfilePage() {
               {editing ? (
                 <input
                   value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  onChange={(e) => { setForm((f) => ({ ...f, name: e.target.value })); setError(""); }}
                   className="w-full sm:max-w-sm h-10 px-3.5 rounded-xl border border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none text-sm text-slate-900 transition-all"
                 />
               ) : (
@@ -169,7 +169,7 @@ export default function ProfilePage() {
               {editing ? (
                 <input
                   value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  onChange={(e) => { setForm((f) => ({ ...f, phone: e.target.value })); setError(""); }}
                   placeholder="+91 98765 43210"
                   className="w-full sm:max-w-sm h-10 px-3.5 rounded-xl border border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none text-sm text-slate-900 transition-all"
                 />

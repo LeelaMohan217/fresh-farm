@@ -155,7 +155,7 @@ export default function AddressesPage() {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Full Address</label>
               <textarea
                 value={form.address}
-                onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                onChange={(e) => { setForm((f) => ({ ...f, address: e.target.value })); setError(""); }}
                 rows={3}
                 placeholder="House/flat no., street, area, city..."
                 className="w-full px-3.5 py-3 rounded-xl border border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none text-sm text-slate-900 resize-none transition-all"
@@ -167,7 +167,7 @@ export default function AddressesPage() {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">Pincode</label>
               <input
                 value={form.pincode}
-                onChange={(e) => setForm((f) => ({ ...f, pincode: e.target.value }))}
+                onChange={(e) => { setForm((f) => ({ ...f, pincode: e.target.value })); setError(""); }}
                 maxLength={6}
                 placeholder="500032"
                 className="w-32 h-10 px-3.5 rounded-xl border border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none text-sm text-slate-900 transition-all"
@@ -187,7 +187,7 @@ export default function AddressesPage() {
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-slate-500 mb-1.5 flex items-center gap-1"><Phone className="w-3 h-3" /> Phone</label>
-                  <input value={form.receiver_phone} onChange={(e) => setForm((f) => ({ ...f, receiver_phone: e.target.value }))}
+                  <input value={form.receiver_phone} onChange={(e) => { setForm((f) => ({ ...f, receiver_phone: e.target.value })); setError(""); }}
                     placeholder="10-digit mobile" inputMode="numeric" maxLength={10}
                     className="w-full h-10 px-3.5 rounded-xl border border-slate-200 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none text-sm text-slate-900 transition-all"
                   />
