@@ -31,9 +31,11 @@ async function getCategories() {
 async function searchProducts(q: string) {
   const { rows } = await pool.query(
     `SELECT p.id, p.name, p.price, p.unit, p.image_url,
-            c.name AS category_name, c.slug AS category_slug
+            sub.name AS category_name,
+            COALESCE(top.slug, sub.slug) AS top_slug
      FROM products p
-     JOIN categories c ON c.id = p.category_id
+     JOIN categories sub ON sub.id = p.category_id
+     LEFT JOIN categories top ON top.id = sub.parent_id
      WHERE p.stock > 0 AND p.name ILIKE $1
      ORDER BY p.name ASC`,
     [`%${q}%`]
@@ -45,7 +47,7 @@ async function searchProducts(q: string) {
     unit: r.unit as string,
     imageUrl: (r.image_url ?? null) as string | null,
     categoryName: r.category_name as string,
-    categorySlug: r.category_slug as string,
+    categorySlug: r.top_slug as string,
   }));
 }
 
