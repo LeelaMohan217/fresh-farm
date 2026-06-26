@@ -105,7 +105,7 @@ const WHY_US = [
 function ProductCard({ product }: { product: Product }) {
   return (
     <Link
-      href={`/shop/category/${product.topCategorySlug}`}
+      href={`/shop/product/${product.id}`}
       className="flex-shrink-0 w-36 sm:w-44 bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-lg hover:border-green-100 transition-all duration-200 group flex flex-col"
     >
       <div className="relative bg-green-50 flex items-center justify-center overflow-hidden" style={{ height: 140 }}>

@@ -92,7 +92,7 @@ export default async function ShopPage({
               {products.map((p) => (
                 <Link
                   key={p.id}
-                  href={`/shop/category/${p.categorySlug}`}
+                  href={`/shop/product/${p.id}`}
                   className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-md hover:border-green-200 transition-all"
                 >
                   <div className="relative h-32 bg-green-50 overflow-hidden">

@@ -30,7 +30,7 @@ function ProductCard({ product }: { product: Product }) {
     <div className="bg-white rounded-xl border border-slate-100 overflow-hidden hover:shadow-sm transition-all duration-200 flex flex-col">
       <div
         className="relative h-40 bg-[#f5f5f5] flex items-center justify-center overflow-hidden cursor-pointer"
-        onClick={() => router.push(`/shop/${product.id}`)}
+        onClick={() => router.push(`/shop/product/${product.id}`)}
       >
         {product.imageUrl
           ? <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
@@ -51,7 +51,7 @@ function ProductCard({ product }: { product: Product }) {
           <Clock className="w-3 h-3" /> 8 MINS
         </div>
         <p className="text-sm font-bold text-slate-900 leading-snug cursor-pointer hover:text-green-700 transition-colors line-clamp-2"
-          onClick={() => router.push(`/shop/${product.id}`)}>
+          onClick={() => router.push(`/shop/product/${product.id}`)}>
           {product.name}
         </p>
         <p className="text-xs text-slate-400">{product.unit}</p>
