@@ -7,7 +7,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const session = await getAdminSession();
   const isSuperAdmin = session?.role === "superadmin";
   const initialAdmin = session
-    ? { id: session.id, name: session.name, email: session.email, role: session.role }
+    ? { id: session.id, name: session.name, role: session.role }
     : null;
 
   return (
