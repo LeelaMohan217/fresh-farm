@@ -98,11 +98,21 @@ export default function TopBar({ initialAdmin }: { initialAdmin?: AdminSession }
     } catch {}
   }, []);
 
-  // Initial fetch + poll every 30 s
+  // Initial fetch + poll every 60s as fallback
   useEffect(() => {
     fetchNotifications();
     pollRef.current = setInterval(fetchNotifications, 60_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [fetchNotifications]);
+
+  // SSE — refetch instantly when a new order arrives
+  useEffect(() => {
+    const es = new EventSource("/api/admin/stream");
+    es.onmessage = (e) => {
+      if (e.data === "refresh") fetchNotifications();
+    };
+    es.onerror = () => es.close();
+    return () => es.close();
   }, [fetchNotifications]);
 
   const handleMarkAllRead = async () => {
