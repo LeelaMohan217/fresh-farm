@@ -153,11 +153,8 @@ export default async function HomePage() {
       {topCategories.length > 0 && (
         <section className="bg-white border-b border-slate-100 py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-slate-900">Shop by Category</h2>
-              <Link href="/shop" className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors">
-                See all
-              </Link>
+            <div className="mb-5">
+              <h2 className="text-[14px] font-semibold text-slate-900">Shop by Category</h2>
             </div>
             <CategoryGrid categories={topCategories} />
           </div>
