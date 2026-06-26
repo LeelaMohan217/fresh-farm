@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  cloudinary.config({ cloudinary_url: process.env.CLOUDINARY_URL });
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
