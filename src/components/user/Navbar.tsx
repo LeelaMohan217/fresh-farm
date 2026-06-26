@@ -231,6 +231,12 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const showSearch =
+    pathname === "/" ||
+    pathname.startsWith("/shop") ||
+    pathname === "/showcase" ||
+    pathname.startsWith("/services");
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 8);
     window.addEventListener("scroll", fn);
@@ -295,8 +301,8 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Row 2: Full-width search bar — hidden on cart and account pages */}
-        {!pathname.startsWith("/account") && pathname !== "/cart" && (
+        {/* Row 2: Search — only on discovery pages (home, shop, showcase, services) */}
+        {showSearch && (
           <div className="px-3 pb-3">
             <SearchBar />
           </div>
