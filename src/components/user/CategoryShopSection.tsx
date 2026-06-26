@@ -46,42 +46,41 @@ function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="px-3 pt-2 pb-3 flex flex-col flex-1 gap-1">
+      <div className="px-3 pt-2 pb-3 flex flex-col flex-1">
         <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
           <Clock className="w-3 h-3" /> 8 MINS
         </div>
-        <p className="text-sm font-bold text-slate-900 leading-snug cursor-pointer hover:text-green-700 transition-colors line-clamp-2"
+        <p className="text-sm font-bold text-slate-900 leading-snug cursor-pointer hover:text-green-700 transition-colors line-clamp-2 mt-1 flex-1"
           onClick={() => router.push(`/shop/product/${product.id}`)}>
           {product.name}
         </p>
-        <p className="text-xs text-slate-400">{product.unit}</p>
+        <p className="text-xs text-slate-400 mt-0.5">{product.unit}</p>
 
-        <div className="flex items-end justify-between mt-1 gap-2">
-          <div>
-            <p className="text-sm font-extrabold text-slate-900">₹{product.price}</p>
-            <p className="text-[11px] text-slate-400 line-through">₹{mrp}</p>
-          </div>
-          {product.stock > 0 && (
-            cartItem ? (
-              <div className="flex items-center border-2 border-green-600 rounded-lg overflow-hidden shrink-0">
-                <button onClick={() => update(product.id, cartItem.quantity - 1)}
-                  className="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition cursor-pointer">
-                  <Minus className="w-3 h-3" />
-                </button>
-                <span className="w-6 text-center text-sm font-bold text-slate-900">{cartItem.quantity}</span>
-                <button onClick={() => update(product.id, cartItem.quantity + 1)}
-                  className="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition cursor-pointer">
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => user ? add({ id: product.id, name: product.name, price: product.price, unit: product.unit }) : router.push("/auth/login")}
-                className="shrink-0 text-sm font-bold text-green-600 border-2 border-green-600 px-4 py-1.5 rounded-lg hover:bg-green-600 hover:text-white transition-all cursor-pointer"
-              >ADD</button>
-            )
-          )}
+        <div className="mt-2">
+          <p className="text-sm font-extrabold text-slate-900">₹{product.price}</p>
+          <p className="text-[11px] text-slate-400 line-through">₹{mrp}</p>
         </div>
+
+        {product.stock > 0 && (
+          cartItem ? (
+            <div className="mt-2 flex items-center justify-between border-2 border-green-600 rounded-lg overflow-hidden">
+              <button onClick={() => update(product.id, cartItem.quantity - 1)}
+                className="flex-1 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition cursor-pointer">
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+              <span className="text-sm font-bold text-slate-900 px-2">{cartItem.quantity}</span>
+              <button onClick={() => update(product.id, cartItem.quantity + 1)}
+                className="flex-1 h-8 flex items-center justify-center text-green-600 hover:bg-green-50 transition cursor-pointer">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => user ? add({ id: product.id, name: product.name, price: product.price, unit: product.unit }) : router.push("/auth/login")}
+              className="mt-2 w-full h-8 text-sm font-bold text-green-600 border-2 border-green-600 rounded-lg hover:bg-green-600 hover:text-white transition-all cursor-pointer"
+            >ADD</button>
+          )
+        )}
       </div>
     </div>
   );
