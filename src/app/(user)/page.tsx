@@ -177,7 +177,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2 -mx-4 px-4 sm:-mx-6 sm:px-6">
-                {sec.products.map((p) => (
+                {sec.products.slice(0, 6).map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
