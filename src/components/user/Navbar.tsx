@@ -176,7 +176,7 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
                 Products
               </p>
               {data.products.map((p) => (
-                <button key={p.id} onClick={() => { setOpen(false); onClose?.(); router.push(`/shop/product/${p.id}`); }}
+                <button key={p.id} onClick={() => { setQuery(p.name); navigate(p.name, true); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 transition-colors text-left group"
                 >
                   <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-100 bg-slate-50">
