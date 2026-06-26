@@ -83,7 +83,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white sm:bg-[#F7F8FA] flex flex-col">
+    <div className="h-[100dvh] bg-white sm:bg-[#F7F8FA] flex flex-col overflow-y-auto">
 
       {/* top bar — desktop only */}
       <div className="hidden sm:flex items-center justify-between px-8 py-5">
