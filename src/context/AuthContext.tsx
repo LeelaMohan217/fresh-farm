@@ -16,11 +16,12 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {}, refresh: async () => {},
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children, initialUser }: { children: React.ReactNode; initialUser?: AuthUser | null }) {
+  const [user, setUser] = useState<AuthUser | null>(initialUser ?? null);
+  const [loading, setLoading] = useState(false);
 
   const refresh = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/auth/me");
       if (res.ok) setUser(await res.json());
@@ -32,7 +33,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => { refresh(); }, []);
+  // Only fetch on mount if no server-side initial user was provided
+  useEffect(() => { if (initialUser === undefined) refresh(); }, []);
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });

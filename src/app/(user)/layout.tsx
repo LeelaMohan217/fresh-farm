@@ -3,6 +3,7 @@ import { Sprout, Leaf, Phone, Mail, MapPin } from "lucide-react";
 import Navbar from "@/components/user/Navbar";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { getSession } from "@/lib/auth";
 
 const SOCIAL = [
   {
@@ -186,9 +187,14 @@ function Footer() {
   );
 }
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default async function UserLayout({ children }: { children: React.ReactNode }) {
+  const session = await getSession();
+  const initialUser = session
+    ? { id: session.id, name: session.name, email: session.email }
+    : null;
+
   return (
-    <AuthProvider>
+    <AuthProvider initialUser={initialUser}>
       <CartProvider>
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
           <Navbar />
