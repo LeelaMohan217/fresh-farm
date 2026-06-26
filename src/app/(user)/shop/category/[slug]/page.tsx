@@ -82,7 +82,10 @@ export default async function CategoryPage({
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="px-3 pt-3 pb-2">
+          <h1 className="text-[15px] font-bold text-slate-900">{category.name as string}</h1>
+        </div>
         <CategoryShopSection
           categoryName={category.name as string}
           categorySlug={category.slug as string}

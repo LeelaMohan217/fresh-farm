@@ -29,7 +29,7 @@ function ProductCard({ product }: { product: Product }) {
   return (
     <div className="bg-white rounded-xl border border-slate-100 overflow-hidden hover:shadow-sm transition-all duration-200 flex flex-col">
       <div
-        className="relative h-40 bg-[#f5f5f5] flex items-center justify-center overflow-hidden cursor-pointer"
+        className="relative h-36 bg-[#f5f5f5] flex items-center justify-center overflow-hidden cursor-pointer"
         onClick={() => router.push(`/shop/product/${product.id}`)}
       >
         {product.imageUrl
@@ -46,7 +46,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="px-3 pt-2 pb-3 flex flex-col flex-1">
+      <div className="px-2 pt-1.5 pb-2 flex flex-col flex-1">
         <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
           <Clock className="w-3 h-3" /> 8 MINS
         </div>
@@ -111,17 +111,17 @@ export default function CategoryShopSection({
 
   return (
     <div>
-      <div className="flex gap-0 bg-white rounded-2xl border border-slate-100 overflow-hidden min-h-[80vh]">
+      <div className="flex gap-0 bg-white border-t border-slate-100 overflow-hidden min-h-[80vh]">
 
         {/* ── Sub-category sidebar ── */}
         <aside
-          className="w-24 sm:w-28 shrink-0 border-r border-slate-100 overflow-y-auto"
-          style={{ maxHeight: "calc(100vh - 120px)", position: "sticky", top: 80 }}
+          className="w-20 sm:w-24 shrink-0 border-r border-slate-100 overflow-y-auto"
+          style={{ maxHeight: "calc(100vh - 110px)", position: "sticky", top: 72 }}
         >
           {/* All */}
           <button
             onClick={() => setSelectedSub(null)}
-            className={`w-full flex flex-col items-center gap-1.5 py-3 px-1 transition-all border-l-2 ${
+            className={`w-full flex flex-col items-center gap-1 py-2.5 px-1 transition-all border-l-2 ${
               !selectedSub ? "border-green-600 bg-green-50" : "border-transparent hover:bg-slate-50"
             }`}
           >
@@ -137,7 +137,7 @@ export default function CategoryShopSection({
             <button
               key={sub.id}
               onClick={() => setSelectedSub(sub.id === selectedSub ? null : sub.id)}
-              className={`w-full flex flex-col items-center gap-1.5 py-3 px-1 transition-all border-l-2 ${
+              className={`w-full flex flex-col items-center gap-1 py-2.5 px-1 transition-all border-l-2 ${
                 selectedSub === sub.id ? "border-green-600 bg-green-50" : "border-transparent hover:bg-slate-50"
               }`}
             >
@@ -158,13 +158,9 @@ export default function CategoryShopSection({
         </aside>
 
         {/* ── Product grid ── */}
-        <div className="flex-1 min-w-0 p-4">
-          <h2 className="text-base font-extrabold text-slate-900 mb-4">
-            {selectedSubName ?? categoryName}
-          </h2>
-
+        <div className="flex-1 min-w-0 p-2">
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2">
               {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
           ) : (
