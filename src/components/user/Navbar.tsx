@@ -87,7 +87,7 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
     return () => document.removeEventListener("mousedown", fn);
   }, []);
 
-  const hasResults = data.suggestions.length > 0 || data.categories.length > 0 || data.products.length > 0;
+  const hasResults = !!query.trim() || data.suggestions.length > 0 || data.categories.length > 0 || data.products.length > 0;
   const showEmpty  = open && !query.trim() && data.trending.length > 0;
   const showNoResult = open && query.trim() && !loading && !hasResults;
 
@@ -133,9 +133,18 @@ function SearchBar({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {data.suggestions.length > 0 && (
+          {query.trim() && (
             <div className="pt-2">
-              {data.suggestions.map((s) => (
+              {/* Always show the typed term first */}
+              <button onClick={() => { setQuery(query.trim()); navigate(query.trim(), true); }}
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left group"
+              >
+                <Search className="w-4 h-4 text-slate-300 shrink-0 group-hover:text-green-500 transition-colors" />
+                <span className="text-sm font-bold text-slate-900 flex-1">{query.trim()}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-green-500 transition-colors" />
+              </button>
+              {/* Additional suggestions from search history */}
+              {data.suggestions.filter((s) => s.toLowerCase() !== query.trim().toLowerCase()).map((s) => (
                 <button key={s} onClick={() => { setQuery(s); navigate(s, true); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left group"
                 >
