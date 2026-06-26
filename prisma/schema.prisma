@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ──────────────────────────────
+// ENUMS
+// ──────────────────────────────
+
+enum CustomerStatus {
+  Active
+  Inactive
+}
+
+enum OrderStatus {
+  Pending
+  Processing
+  Shipped
+  Delivered
+  Cancelled
+}
+
+enum BulkOrderStatus {
+  Pending
+  Confirmed
+  Processing
+  Cancelled
+}
+
+enum EventType {
+  Wedding
+  Birthday
+  Corporate
+  Festival
+  Other
+}
+
+enum ServiceType {
+  Hydroponic
+  Aeroponic
+  Consultation
+}
+
+enum ServiceStatus {
+  Active
+  Inactive
+}
+
+// ──────────────────────────────
+// MODELS
+// ──────────────────────────────
+
+model Customer {
+  id                  String         @id
+  name                String
+  email               String         @unique
+  phone               String
+  password            String
+  address             String?
+  pincode             String?
+  status              CustomerStatus @default(Active)
+  joinedDate          DateTime       @map("joined_date")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  orders              Order[]
+  bulkOrders          BulkOrder[]
+  cartItems           CartItem[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("customers")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  unit        String    // kg, pcs, bunch, box
+  categoryId  Int       @map("category_id")
+  stock       Int       @default(0)
+  imageUrl    String?   @map("image_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+
+  @@map("products")
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  customerId String   @map("customer_id")
+  productId  Int      @map("product_id")
+  quantity   Int      @default(1)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, productId])
+  @@map("cart_items")
+}
+
+model Order {
+  id            String      @id
+  customerId    String      @map("customer_id")
+  status        OrderStatus @default(Pending)
+  paymentMethod String      @map("payment_method")
+  subtotal      Decimal     @db.Decimal(10, 2)
+  deliveryFee   Decimal     @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  discount      Decimal     @default(0) @db.Decimal(10, 2)
+  total         Decimal     @db.Decimal(10, 2)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  customer      Customer    @relation(fields: [customerId], references: [id])
+  items         OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         Int     @id @default(autoincrement())
+  orderId    String  @map("order_id")
+  productId  Int     @map("product_id")
+  quantity   Int
+  unitPrice  Decimal @map("unit_price") @db.Decimal(10, 2)
+  totalPrice Decimal @map("total_price") @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model BulkOrder {
+  id           String          @id
+  customerId   String          @map("customer_id")
+  eventType    EventType       @map("event_type")
+  status       BulkOrderStatus @default(Pending)
+  bookingDate  DateTime        @map("booking_date")
+  deliveryDate DateTime        @map("delivery_date")
+  quantityDesc String          @map("quantity_desc")
+  itemsDesc    String          @map("items_desc")
+  total        Decimal         @db.Decimal(10, 2)
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  customer     Customer        @relation(fields: [customerId], references: [id])
+
+  @@map("bulk_orders")
+}
+
+model Service {
+  id          Int           @id @default(autoincrement())
+  name        String
+  type        ServiceType
+  description String?
+  price       Decimal       @db.Decimal(10, 2)
+  status      ServiceStatus @default(Active)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("services")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  token      String   @unique
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  customer   Customer @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@map("password_reset_tokens")
+}
