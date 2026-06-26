@@ -23,6 +23,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const { user, logout } = useAuth();
 
   const currentPage = NAV.find((n) => n.href === pathname);
+  const isOverview  = pathname === "/account";
 
   const handleLogout = async () => {
     await logout();
@@ -34,10 +35,15 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
       {/* ── Mobile: slim page header ── */}
       <div className="lg:hidden bg-white border-b border-slate-100 px-4 py-3 flex items-center gap-3">
-        <button onClick={() => router.back()} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors shrink-0">
+        <Link
+          href={isOverview ? "/" : "/account"}
+          className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors shrink-0"
+        >
           <ChevronLeft className="w-5 h-5 text-slate-600" />
-        </button>
-        <p className="text-[15px] font-semibold text-slate-900">{currentPage?.label ?? "My Account"}</p>
+        </Link>
+        <p className="text-[15px] font-semibold text-slate-900">
+          {isOverview ? "My Account" : (currentPage?.label ?? "My Account")}
+        </p>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 lg:py-8">
