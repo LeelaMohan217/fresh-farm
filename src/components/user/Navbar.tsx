@@ -295,8 +295,8 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Row 2: Full-width search bar — hidden on cart page */}
-        {pathname !== "/cart" && (
+        {/* Row 2: Full-width search bar — hidden on cart and account pages */}
+        {!pathname.startsWith("/account") && pathname !== "/cart" && (
           <div className="px-3 pb-3">
             <SearchBar />
           </div>
