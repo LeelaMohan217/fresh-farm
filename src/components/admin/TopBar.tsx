@@ -24,7 +24,7 @@ import {
 type AdminSession = {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   role: string;
 } | null;
 
@@ -69,21 +69,24 @@ const ROLE_COLOR: Record<string, string> = {
   admin: "bg-green-500",
 };
 
-export default function TopBar() {
+export default function TopBar({ initialAdmin }: { initialAdmin?: AdminSession }) {
   const router = useRouter();
   const crumbs = useBreadcrumb();
-  const [admin, setAdmin] = useState<AdminSession>(null);
+  const [admin, setAdmin] = useState<AdminSession>(initialAdmin ?? null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Fetch email lazily if not in JWT (email not stored in JWT payload)
   useEffect(() => {
-    fetch("/api/admin/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (data) setAdmin(data); })
-      .catch(() => {});
-  }, []);
+    if (admin && !admin.email) {
+      fetch("/api/admin/me")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => { if (data?.email) setAdmin((prev) => prev ? { ...prev, email: data.email } : prev); })
+        .catch(() => {});
+    }
+  }, [admin?.id]);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -98,7 +101,7 @@ export default function TopBar() {
   // Initial fetch + poll every 30 s
   useEffect(() => {
     fetchNotifications();
-    pollRef.current = setInterval(fetchNotifications, 30_000);
+    pollRef.current = setInterval(fetchNotifications, 60_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [fetchNotifications]);
 

@@ -92,6 +92,7 @@ function SubMenuLink({ href, label }: NavChild) {
   return (
     <Link
       href={href}
+      prefetch={false}
       className={cn(
         "flex items-center px-3 py-2 rounded-lg text-xs font-medium",
         "transition-colors duration-150",
@@ -160,7 +161,7 @@ function NavRow({ item, isOpen, onToggle }: {
 
   if (collapsed) {
     return (
-      <Link href={item.href} title={item.label} className={rowClass}>
+      <Link href={item.href} title={item.label} prefetch={false} className={rowClass}>
         {activeBar}
         {iconBox}
       </Link>
@@ -185,7 +186,7 @@ function NavRow({ item, isOpen, onToggle }: {
   }
 
   return (
-    <Link href={item.href} className={rowClass}>
+    <Link href={item.href} prefetch={false} className={rowClass}>
       {activeBar}
       {iconBox}
       <span className="leading-none">{item.label}</span>

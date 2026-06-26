@@ -6,6 +6,9 @@ import { getAdminSession } from "@/lib/auth";
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getAdminSession();
   const isSuperAdmin = session?.role === "superadmin";
+  const initialAdmin = session
+    ? { id: session.id, name: session.name, email: session.email, role: session.role }
+    : null;
 
   return (
     <SidebarProvider>
@@ -19,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         {/* Main content — overflow-hidden only here */}
         <div className="flex flex-col flex-1 overflow-hidden min-w-0">
-          <TopBar />
+          <TopBar initialAdmin={initialAdmin} />
           <main className="flex-1 overflow-y-auto p-6 ">
             {children}
           </main>
