@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import {
   ShoppingCart, Sprout, LogOut, ChevronDown,
   X, Search, TrendingUp, Tag, ArrowRight,
-  User, MapPin, ShoppingBag, Settings, ClipboardList,
+  User, MapPin, ShoppingBag, Settings,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
@@ -228,7 +228,6 @@ export default function Navbar() {
   const { count } = useCart();
   const { user, logout } = useAuth();
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   const showSearch =
@@ -246,7 +245,6 @@ export default function Navbar() {
   const handleLogout = async () => {
     await logout();
     router.push("/");
-    setMenuOpen(false);
   };
 
   return (
@@ -285,19 +283,19 @@ export default function Navbar() {
 
           {/* Profile / Auth */}
           {user ? (
-            <button
-              onClick={() => { setMenuOpen(!menuOpen); }}
+            <Link
+              href="/account"
               className="w-9 h-9 bg-green-600 text-white rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
             >
               {getInitials(user.name)}
-            </button>
+            </Link>
           ) : (
-            <button
-              onClick={() => { setMenuOpen(!menuOpen); }}
+            <Link
+              href="/auth/login"
               className="w-9 h-9 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 shrink-0"
             >
               <User className="w-5 h-5" />
-            </button>
+            </Link>
           )}
         </div>
 
@@ -402,113 +400,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── Mobile account bottom sheet ── */}
-      {menuOpen && (
-        <div className="md:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 z-40"
-            onClick={() => setMenuOpen(false)}
-          />
-
-          {/* Sheet */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl">
-            {/* Drag handle */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-9 h-1 bg-slate-200 rounded-full" />
-            </div>
-
-            {user ? (
-              <>
-                {/* User header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
-                      {getInitials(user.name)}
-                    </div>
-                    <div>
-                      <p className="text-[15px] font-semibold text-slate-900">{user.name}</p>
-                      <p className="text-[13px] text-slate-500">{user.email}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setMenuOpen(false)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Account links */}
-                <div className="px-3 pt-2 pb-1">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-3 py-2">
-                    Your Information
-                  </p>
-                  {[
-                    { href: "/account/profile",   icon: User,         label: "Profile"          },
-                    { href: "/account/orders",     icon: ClipboardList,label: "Order History"    },
-                    { href: "/account/addresses",  icon: MapPin,       label: "Address Book"     },
-                    { href: "/account/settings",   icon: Settings,     label: "Account Privacy"  },
-                  ].map(({ href, icon: Icon, label }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setMenuOpen(false)}
-                      className={cn(
-                        "flex items-center gap-4 px-3 py-3 rounded-xl transition-colors",
-                        pathname === href ? "bg-green-50 text-green-700" : "text-slate-700 hover:bg-slate-50"
-                      )}
-                    >
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                        <Icon className="w-[18px] h-[18px] text-slate-500" />
-                      </div>
-                      <span className="text-[15px] font-medium">{label}</span>
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Logout */}
-                <div className="px-3 pt-1 pb-8 border-t border-slate-100 mt-1">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-4 px-3 py-3 rounded-xl text-slate-700 hover:bg-red-50 transition-colors"
-                  >
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                      <LogOut className="w-[18px] h-[18px] text-slate-500" />
-                    </div>
-                    <span className="text-[15px] font-medium">Logout</span>
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-between px-5 pt-4 pb-3">
-                  <h3 className="text-[17px] font-semibold text-slate-900">Welcome to FarmFresh</h3>
-                  <button
-                    onClick={() => setMenuOpen(false)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-                <p className="text-[14px] text-slate-500 px-5 pb-5">
-                  Sign in to view your orders and manage your account.
-                </p>
-                <div className="flex gap-3 px-5 pb-10">
-                  <Link href="/auth/login" onClick={() => setMenuOpen(false)}
-                    className="flex-1 text-center py-3 text-[15px] font-semibold border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 transition-colors">
-                    Sign in
-                  </Link>
-                  <Link href="/auth/register" onClick={() => setMenuOpen(false)}
-                    className="flex-1 text-center py-3 text-[15px] font-semibold bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors">
-                    Create account
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }
